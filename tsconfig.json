@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "lib": ["esnext", "dom"],
+
+    "outDir": "dist",
+
+    "strict": true,
+    "sourceMap": false,
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src"],
+  "exclude": ["dist"]
+}
