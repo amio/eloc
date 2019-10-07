@@ -33,7 +33,7 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   const handler = router()(
     get('/', sendIndex(filename)),
     get('/index.js', serveDir('../assets')),
-    get('/markdown-deck.*', serveDir('../node_modules/markdown-deck/dist')),
+    get('/markdown-deck.min.js', sendMarkdownDeckJs()),
     get('/*', serveUserAssets(dir, filename, options.include)),
     post('/api/save', handleSave(filepath, verboseLog))
   )
@@ -62,6 +62,15 @@ function sendIndex (filename: string) {
     const indexHTML = createIndex(filename)
     res.setHeader('Content-Type', 'text/html')
     res.end(indexHTML)
+  }
+}
+
+function sendMarkdownDeckJs () {
+  const deckJsFile = resolve(__dirname, '../node_modules/markdown-deck/dist/markdown-deck.min.js')
+  const deckJs = fs.readFileSync(deckJsFile)
+  return (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'text/javascript')
+    res.end(deckJs)
   }
 }
 
