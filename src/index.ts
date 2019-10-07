@@ -20,7 +20,7 @@ const help = `
     -p, --port      ${dim('Port (default: 3000)')}
     -d, --out-dir   ${dim('Output directory (default: public)')}
     -i, --include   ${dim('Include files for referencing in markdown')}
-    -t, --title     ${dim('HTML title (default: <markdown-filename>)')}
+    -t, --title     ${dim('HTML title (default: <markdown-file-name>)')}
 
   Flags
 

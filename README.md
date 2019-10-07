@@ -42,7 +42,8 @@ then `eloc slides.md` gives you:
 
     -p, --port      Port (default: 3000)
     -d, --out-dir   Output directory (default: public)
-    -i, --include   Include files for referenceing in markdown
+    -i, --include   Include files for referenceing in markdow
+    -t, --title     HTML title (default: <markdown-file-name>)
 
     -h, --help      Display usage information
     -v, --version   Display version number
