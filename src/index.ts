@@ -20,6 +20,7 @@ const help = `
     -p, --port      ${dim('Port (default: 3000)')}
     -d, --out-dir   ${dim('Output directory (default: public)')}
     -i, --include   ${dim('Include files for referencing in markdown')}
+    -t, --title     ${dim('HTML title (default: <markdown-filename>)')}
 
   Flags
 
@@ -39,13 +40,14 @@ const help = `
 `
 
 const { _: params, ...options } = mri(process.argv.slice(2), {
-  string: ['out-dir', 'include'],
+  string: ['out-dir', 'include', 'title'],
   boolean: ['help', 'version', 'quiet'],
   alias: {
     h: 'help',
     v: 'version',
     d: 'out-dir',
     i: 'include',
+    t: 'title',
     q: 'quiet',
     p: 'port'
   }

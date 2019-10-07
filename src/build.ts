@@ -5,6 +5,7 @@ import fse from 'fs-extra'
 interface BuildOptions {
   'out-dir'?: string;
   'include'?: string;
+  'title'?: string;
 }
 
 export default async function build (markdownFile: string, options: BuildOptions) {
@@ -28,7 +29,7 @@ export default async function build (markdownFile: string, options: BuildOptions
   await fse.copy(resolve(__dirname, '../node_modules/markdown-deck/dist'), resolve(dest, 'assets'))
 
   // write index.html
-  await fse.outputFile(resolve(dest, 'index.html'), createIndex(filename))
+  await fse.outputFile(resolve(dest, 'index.html'), createIndex(filename, options.title))
 }
 
 async function globCopy (globs: string, source: string, dest: string) {

@@ -17,6 +17,7 @@ interface ServeOptions {
   open?: boolean;
   quiet?: boolean;
   include?: string;
+  title?: string;
 }
 
 const { PORT = '5000' } = process.env
@@ -31,7 +32,7 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   }
 
   const handler = router()(
-    get('/', sendIndex(filename)),
+    get('/', sendIndex(filename, options.title)),
     get('/index.js', serveDir('../assets')),
     get('/markdown-deck.min.js', sendMarkdownDeckJs()),
     get('/*', serveUserAssets(dir, filename, options.include)),
@@ -57,9 +58,9 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   })
 }
 
-function sendIndex (filename: string) {
+function sendIndex (filename: string, title?: string) {
   return (req: Request, res: Response) => {
-    const indexHTML = createIndex(filename)
+    const indexHTML = createIndex(filename, title)
     res.setHeader('Content-Type', 'text/html')
     res.end(indexHTML)
   }
@@ -121,14 +122,14 @@ function handleSave (filePath: string, verboseLog: typeof console.info) {
   }
 }
 
-function createIndex (filename: string): string {
+function createIndex (filename: string, title?: string): string {
   return `<!DOCTYPE html>
   <html>
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>${filename}</title>
+      <title>${title || filename}</title>
       <script type="module" src="markdown-deck.min.js"></script>
       <style>
         html, body { height: 100%; margin: 0 }
