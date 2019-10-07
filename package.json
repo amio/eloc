@@ -13,20 +13,20 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "iconv-lite": "^0.4.19"
+    "iconv-lite": "^0.4.19",
+    "markdown-deck": "^1.0.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",
     "@types/micro": "^7.3.3",
     "@types/micromatch": "^3.1.0",
     "@types/mri": "^1.1.0",
-    "@types/node": "^12.7.9",
+    "@types/node": "^12.7.11",
     "@types/serve-handler": "^6.1.0",
     "@zeit/ncc": "^0.20.5",
     "fs-extra": "^8.1.0",
     "globby": "^10.0.1",
     "kleur": "^3.0.3",
-    "markdown-deck": "^0.1.1",
     "micro": "^9.3.4",
     "micro-fork": "^2.0.0",
     "micromatch": "^4.0.2",
