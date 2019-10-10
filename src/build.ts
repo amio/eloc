@@ -26,7 +26,8 @@ export default async function build (markdownFile: string, options: BuildOptions
   include && await globCopy(include, dir, dest)
 
   // copy markdown-deck files
-  await fse.copy(resolve(__dirname, '../node_modules/markdown-deck/dist'), resolve(dest, 'assets'))
+  const mddist = resolve(__dirname, '..', 'node_modules', 'markdown-deck', 'dist')
+  await fse.copy(mddist, resolve(dest, 'assets'))
 
   // write index.html
   await fse.outputFile(resolve(dest, 'index.html'), createIndex(filename, options.title))
