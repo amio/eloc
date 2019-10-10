@@ -20,7 +20,7 @@
     "@types/micro": "^7.3.3",
     "@types/micromatch": "^3.1.0",
     "@types/mri": "^1.1.0",
-    "@types/node": "^12.7.11",
+    "@types/node": "^12.7.12",
     "@types/serve-handler": "^6.1.0",
     "@zeit/ncc": "^0.20.5",
     "fs-extra": "^8.1.0",
