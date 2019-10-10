@@ -6,10 +6,14 @@
 
 Eloquence cli.
 
-> "True eloquence, does not consist in saying great things in a sublime style, but in a simple style."
-> _-- Oliver Goldsmith_
+- Serve markdown as presentation
+- Static export
+- Live editor
+- Print view
+- Mobile view
+- Dark mode
 
-https://eloc.now.sh
+All of this in a 1.24MB cli. Checkout https://eloc.now.sh
 
 ### Presentation in Markdown ABC
 
