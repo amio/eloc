@@ -67,7 +67,9 @@ function sendIndex (filename: string, title?: string) {
 }
 
 function sendMarkdownDeckJs () {
-  const deckJsFile = resolve(__dirname, '../node_modules/markdown-deck/dist/markdown-deck.min.js')
+  const deckJsFile = resolve(
+    __dirname, '..', 'node_modules', 'markdown-deck', 'dist', 'markdown-deck.min.js'
+  )
   const deckJs = fs.readFileSync(deckJsFile)
   return (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'text/javascript')
