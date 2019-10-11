@@ -1,6 +1,6 @@
 import fs from 'fs'
 import http from 'http'
-import { resolve, posix, dirname } from 'path'
+import { resolve, basename, dirname } from 'path'
 import micromatch from 'micromatch'
 // @ts-ignore
 import { router, get, post } from 'micro-fork'
@@ -24,7 +24,7 @@ const { PORT = '5000' } = process.env
 
 export default function elocServe (markdownFile: string, options: ServeOptions) {
   const filepath = resolve(process.cwd(), markdownFile)
-  const filename = posix.basename(filepath)
+  const filename = basename(filepath)
   const dir = dirname(filepath)
 
   const verboseLog = (...msg: Array<any>) => {

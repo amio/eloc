@@ -1,4 +1,4 @@
-import { resolve, posix, dirname } from 'path'
+import { resolve, basename, dirname } from 'path'
 import globby from 'globby'
 import fse from 'fs-extra'
 
@@ -13,7 +13,7 @@ export default async function build (markdownFile: string, options: BuildOptions
   const dest = resolve(process.cwd(), out)
 
   const filepath = resolve(process.cwd(), markdownFile)
-  const filename = posix.basename(filepath)
+  const filename = basename(filepath)
   const dir = dirname(filepath)
 
   // ensure dest dir
