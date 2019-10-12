@@ -2,6 +2,8 @@ import { resolve, basename, dirname } from 'path'
 import globby from 'globby'
 import fse from 'fs-extra'
 
+import { createIndexHTML } from './assets'
+
 interface BuildOptions {
   'out-dir'?: string;
   'include'?: string;
@@ -25,12 +27,9 @@ export default async function build (markdownFile: string, options: BuildOptions
   // copy included files
   include && await globCopy(include, dir, dest)
 
-  // copy markdown-deck files
-  const mddist = resolve(__dirname, '..', 'node_modules', 'markdown-deck', 'dist')
-  await fse.copy(mddist, resolve(dest, 'assets'))
-
   // write index.html
-  await fse.outputFile(resolve(dest, 'index.html'), createIndex(filename, options.title))
+  const indexHTML = createIndexHTML({ filename, title: options.title })
+  await fse.outputFile(resolve(dest, 'index.html'), indexHTML)
 }
 
 async function globCopy (globs: string, source: string, dest: string) {
@@ -40,23 +39,4 @@ async function globCopy (globs: string, source: string, dest: string) {
     resolve(source, file),
     resolve(dest, file)
   )))
-}
-
-function createIndex (filename: string, title?: string) {
-  return `<!DOCTYPE html>
-  <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>${title || filename}</title>
-      <script type="module" src="assets/markdown-deck.min.js"></script>
-      <style>
-        html, body { height: 100%; margin: 0 }
-      </style>
-    </head>
-    <body>
-      <markdown-deck src="${filename}" hotkey hashsync></markdown-deck>
-    </body>
-  </html>`
 }

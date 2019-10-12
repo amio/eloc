@@ -5,9 +5,11 @@ import micromatch from 'micromatch'
 // @ts-ignore
 import { router, get, post } from 'micro-fork'
 import { json } from 'micro'
-import serveHandler from 'serve-handler'
 import open from 'open'
+import serveHandler from 'serve-handler'
 import { bold, cyan, underline, dim } from 'kleur'
+
+import { createIndexHTML } from './assets'
 
 type Request = http.IncomingMessage
 type Response = http.ServerResponse
@@ -60,7 +62,7 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
 
 function sendIndex (filename: string, title?: string) {
   return (req: Request, res: Response) => {
-    const indexHTML = createIndex(filename, title)
+    const indexHTML = createIndexHTML({ filename, title, edit: true })
     res.setHeader('Content-Type', 'text/html')
     res.end(indexHTML)
   }
@@ -113,7 +115,7 @@ function handleSave (filePath: string, verboseLog: typeof console.info) {
       fs.writeFileSync(filePath, markdown)
       res.end(`Saved to "${filePath}"`)
       // verboseLog(
-      //   `Saved to ${underline(posix.basename(filePath))} (${markdown.length})`,
+      //   `Saved to ${underline(basename(filePath))} (${markdown.length})`,
       //   dim(new Date().toLocaleTimeString())
       // )
     } catch (e) {
@@ -122,24 +124,4 @@ function handleSave (filePath: string, verboseLog: typeof console.info) {
       console.error(e.message)
     }
   }
-}
-
-function createIndex (filename: string, title?: string): string {
-  return `<!DOCTYPE html>
-  <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>${title || filename}</title>
-      <script type="module" src="markdown-deck.min.js"></script>
-      <style>
-        html, body { height: 100%; margin: 0 }
-      </style>
-    </head>
-    <body>
-      <markdown-deck src="${filename}" hotkey hashsync></markdown-deck>
-      <script type="module" src="index.js"></script>
-    </body>
-  </html>`
 }
