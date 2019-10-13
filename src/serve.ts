@@ -18,7 +18,7 @@ interface ServeOptions {
   port?: number;
   open?: boolean;
   quiet?: boolean;
-  include?: string;
+  include?: string | string[];
   title?: string;
   css?: string;
 }
@@ -31,15 +31,18 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   const filename = basename(filepath)
   const dir = dirname(filepath)
 
+  const userAssets: string[] = [markdownFile]
+    .concat(include as string | string[])
+    .concat(css as string)
+    .filter(Boolean)
+
   const verboseLog = (...msg: Array<any>) => {
     options.quiet || console.info(' ', ...msg)
   }
 
   const handler = router()(
     get('/', sendIndex({ filename, title, css })),
-    get('/index.js', serveDir('../assets')),
-    get('/markdown-deck.min.js', sendMarkdownDeckJs()),
-    get('/*', serveUserAssets(dir, filename, include)),
+    get('/*', serveUserAssets(dir, userAssets)),
     post('/api/save', handleSave(filepath, verboseLog))
   )
 
@@ -68,17 +71,6 @@ function sendIndex ({ filename, title, css }: IndexHTMLOptions) {
   }
 }
 
-function sendMarkdownDeckJs () {
-  const deckJsFile = resolve(
-    __dirname, '..', 'node_modules', 'markdown-deck', 'dist', 'markdown-deck.min.js'
-  )
-  const deckJs = fs.readFileSync(deckJsFile)
-  return (req: Request, res: Response) => {
-    res.setHeader('Content-Type', 'text/javascript')
-    res.end(deckJs)
-  }
-}
-
 function serveDir (dir: string) {
   return (req: Request, res: Response) => serveHandler(req, res, {
     public: resolve(__dirname, dir),
@@ -89,9 +81,8 @@ function serveDir (dir: string) {
   })
 }
 
-function serveUserAssets (cwd: string, markdownFile: string, include?: string) {
+function serveUserAssets (cwd: string, globs: string[]) {
   const handler = serveDir(cwd)
-  const globs = [markdownFile].concat(include ? include.split(',') : [])
 
   return (req: Request, res: Response) => {
     const filepath = (req.url || '').substr(1)

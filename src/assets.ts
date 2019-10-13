@@ -34,7 +34,6 @@ export function createIndexHTML ({filename, title, edit, css}: IndexHTMLOptions)
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
       <title>${title || filename}</title>
-      <script type="module" src="assets/markdown-deck.min.js"></script>
       <style>
         html, body { height: 100%; margin: 0 }
       </style>

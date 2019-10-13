@@ -22,22 +22,20 @@ export default async function build (markdownFile: string, options: BuildOptions
   // ensure dest dir
   await fse.emptyDir(dest)
 
-  // copy main markdown file
-  await fse.copy(filepath, join(dest, filename))
-
-  // copy included files
-  include && await globCopy(include, dir, dest)
-
-  // copy css file
-  css && await fse.copy(css, join(dest, css))
+  // copy files
+  const userAssets = [markdownFile]
+    .concat(include as string)
+    .concat(css as string)
+    .filter(Boolean)
+  await globCopy(userAssets, dir, dest)
 
   // write index.html
   const indexHTML = createIndexHTML({ filename, title, css })
   await fse.outputFile(join(dest, 'index.html'), indexHTML)
 }
 
-async function globCopy (globs: string, source: string, dest: string) {
-  const files = await globby(globs.split(','), { cwd: source })
+async function globCopy (globs: string[], source: string, dest: string) {
+  const files = await globby(globs, { cwd: source })
 
   return Promise.all(files.map(file => fse.copy(
     join(source, file),

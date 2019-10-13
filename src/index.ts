@@ -19,7 +19,7 @@ const help = `
 
     -p, --port      ${dim('Port (default: 3000)')}
     -c, --css       ${dim('Load a css file for customization')}
-    -i, --include   ${dim('Include files for referencing in markdown')}
+    -i, --include   ${dim('Include files for referencing in markdown (format: glob)')}
     -o, --out-dir   ${dim('Output directory for build (default: public)')}
     -t, --title     ${dim('HTML title (default: <markdown-filename>)')}
     -q, --quiet     ${dim('Mute verbose logs')}
