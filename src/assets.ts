@@ -10,7 +10,7 @@ export const markdownDeckSource = readFile(
   'node_modules', 'markdown-deck', 'dist', 'markdown-deck.min.js'
 )
 
-export const editingJsSource = readFile('assets', 'editing.js')
+export const editingJsSource = readFile('src', 'editing.js')
 
 interface IndexHTMLOptions {
   filename: string;

@@ -9,7 +9,6 @@
     "strict": true,
     "sourceMap": false,
     "allowJs": true,
-    "checkJs": true,
     "esModuleInterop": true,
 
     "moduleResolution": "node",
