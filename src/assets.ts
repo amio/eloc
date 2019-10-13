@@ -12,14 +12,17 @@ export const markdownDeckSource = readFile(
 
 export const editingJsSource = readFile('src', 'editing.js')
 
-interface IndexHTMLOptions {
+export interface IndexHTMLOptions {
   filename: string;
   title?: string;
   edit?: true;
+  css?: string;
 }
 
-export function createIndexHTML ({filename, title, edit}: IndexHTMLOptions) {
-  const scripts = [
+export function createIndexHTML ({filename, title, edit, css}: IndexHTMLOptions) {
+  const cssAttribute = css ? `css="${css}"` : ''
+
+  const scriptsContent = [
     markdownDeckSource,
     edit && editingJsSource,
   ].join(';')
@@ -37,8 +40,8 @@ export function createIndexHTML ({filename, title, edit}: IndexHTMLOptions) {
       </style>
     </head>
     <body>
-      <markdown-deck src="${filename}" hotkey hashsync></markdown-deck>
-      <script>${scripts}</script>
+      <markdown-deck src="${filename}" ${cssAttribute} hotkey hashsync></markdown-deck>
+      <script>${scriptsContent}</script>
     </body>
   </html>`
 }

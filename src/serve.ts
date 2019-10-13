@@ -9,7 +9,7 @@ import open from 'open'
 import serveHandler from 'serve-handler'
 import { bold, cyan, underline, dim } from 'kleur'
 
-import { createIndexHTML } from './assets'
+import { createIndexHTML, IndexHTMLOptions } from './assets'
 
 type Request = http.IncomingMessage
 type Response = http.ServerResponse
@@ -20,11 +20,13 @@ interface ServeOptions {
   quiet?: boolean;
   include?: string;
   title?: string;
+  css?: string;
 }
 
 const { PORT = '5000' } = process.env
 
 export default function elocServe (markdownFile: string, options: ServeOptions) {
+  const { title, css, include } = options
   const filepath = resolve(process.cwd(), markdownFile)
   const filename = basename(filepath)
   const dir = dirname(filepath)
@@ -34,10 +36,10 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   }
 
   const handler = router()(
-    get('/', sendIndex(filename, options.title)),
+    get('/', sendIndex({ filename, title, css })),
     get('/index.js', serveDir('../assets')),
     get('/markdown-deck.min.js', sendMarkdownDeckJs()),
-    get('/*', serveUserAssets(dir, filename, options.include)),
+    get('/*', serveUserAssets(dir, filename, include)),
     post('/api/save', handleSave(filepath, verboseLog))
   )
 
@@ -58,9 +60,9 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   })
 }
 
-function sendIndex (filename: string, title?: string) {
+function sendIndex ({ filename, title, css }: IndexHTMLOptions) {
   return (req: Request, res: Response) => {
-    const indexHTML = createIndexHTML({ filename, title, edit: true })
+    const indexHTML = createIndexHTML({ filename, title, css, edit: true })
     res.setHeader('Content-Type', 'text/html')
     res.end(indexHTML)
   }

@@ -18,8 +18,9 @@ const help = `
   Options
 
     -p, --port      ${dim('Port (default: 3000)')}
-    -d, --out-dir   ${dim('Output directory (default: public)')}
+    -c, --css       ${dim('Load a css file for customization')}
     -i, --include   ${dim('Include files for referencing in markdown')}
+    -o, --out-dir   ${dim('Output directory for build (default: public)')}
     -t, --title     ${dim('HTML title (default: <markdown-filename>)')}
     -q, --quiet     ${dim('Mute verbose logs')}
 
@@ -41,16 +42,17 @@ const help = `
 `
 
 const { _: params, ...options } = mri(process.argv.slice(2), {
-  string: ['out-dir', 'include', 'title'],
+  string: ['out-dir', 'include', 'title', 'css'],
   boolean: ['help', 'version', 'quiet'],
   alias: {
     h: 'help',
     v: 'version',
-    d: 'out-dir',
+    o: 'out-dir',
     i: 'include',
     t: 'title',
     q: 'quiet',
-    p: 'port'
+    p: 'port',
+    c: 'css'
   }
 })
 
