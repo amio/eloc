@@ -30,7 +30,7 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   const dir = dirname(filepath)
 
   const verboseLog = (...msg: Array<any>) => {
-    options.quiet || console.info('>', ...msg)
+    options.quiet || console.info(' ', ...msg)
   }
 
   const handler = router()(
@@ -47,12 +47,10 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   server.listen(port).on('listening', () => {
     const url = `http://localhost:${port}`
 
-    console.info(`Presented on ${bold(url)}`)
+    console.info(`\n  Presenting at ${bold(url)}\n`)
 
-    verboseLog(
-      `[${cyan('ESC')}] to toggle editor,`,
-      `[${cyan('CMD+S')}/${cyan('CTRL+S')}] to save to ${underline(filename)}`
-    )
+    verboseLog(dim(' *'), `[${cyan('ESC')}] to toggle editor`)
+    verboseLog(dim(' *'), `[${cyan('CMD+S')}/${cyan('CTRL+S')}] to save to ${underline(filename)}\n`)
 
     options.open && open(url)
   }).on('error', (error: NodeJS.ErrnoException) => {
@@ -114,10 +112,11 @@ function handleSave (filePath: string, verboseLog: typeof console.info) {
       const { markdown } = await json(req) as any
       fs.writeFileSync(filePath, markdown)
       res.end(`Saved to "${filePath}"`)
-      // verboseLog(
-      //   `Saved to ${underline(basename(filePath))} (${markdown.length})`,
-      //   dim(new Date().toLocaleTimeString())
-      // )
+
+      verboseLog(
+        `Saved to ${underline(basename(filePath))} (${markdown.length} Bytes)`,
+        dim(new Date().toLocaleTimeString())
+      )
     } catch (e) {
       res.statusCode = 500
       res.end(e.message)

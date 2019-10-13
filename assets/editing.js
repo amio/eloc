@@ -4,8 +4,8 @@
   window.addEventListener('keydown', ev => {
     if (ev.ctrlKey || ev.metaKey) {
       if (ev.code === 'KeyS') {
-        save(deck.markdown)
         ev.preventDefault()
+        save(deck.markdown)
       }
     }
   })
