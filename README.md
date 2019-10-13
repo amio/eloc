@@ -45,8 +45,9 @@ then `eloc slides.md` gives you:
   Options
 
     -p, --port      Port (default: 3000)
-    -d, --out-dir   Output directory (default: public)
-    -i, --include   Include files for referencing in markdown
+    -c, --css       Customization css
+    -i, --include   Files for referencing in markdown (format: glob)
+    -o, --out-dir   Output directory for build (default: public)
     -t, --title     HTML title (default: <markdown-filename>)
     -q, --quiet     Mute verbose logs
 
