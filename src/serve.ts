@@ -4,7 +4,7 @@ import { resolve, basename, dirname } from 'path'
 import micromatch from 'micromatch'
 // @ts-ignore
 import { router, get, post } from 'micro-fork'
-import { json } from 'micro'
+import { json } from 'micri'
 import open from 'open'
 import serveHandler from 'serve-handler'
 import { bold, cyan, underline, dim } from 'kleur'

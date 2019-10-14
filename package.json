@@ -7,16 +7,12 @@
   "bin": "dist/index.js",
   "scripts": {
     "prebuild": "rm -rf dist",
-    "build": "ncc build src/index.ts -me iconv-lite",
+    "build": "ncc build src/index.ts -m",
     "now-build": "npm run build && node dist build deck.md",
     "prepack": "npm run build"
   },
-  "dependencies": {
-    "iconv-lite": "^0.4.19"
-  },
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",
-    "@types/micro": "^7.3.3",
     "@types/micromatch": "^3.1.0",
     "@types/mri": "^1.1.0",
     "@types/node": "^12.7.12",
@@ -26,7 +22,7 @@
     "globby": "^10.0.1",
     "kleur": "^3.0.3",
     "markdown-deck": "^1.4.0",
-    "micro": "^9.3.4",
+    "micri": "^2.0.1",
     "micro-fork": "^2.0.0",
     "micromatch": "^4.0.2",
     "mri": "^1.1.4",
