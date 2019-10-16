@@ -1,16 +1,11 @@
 import fs from 'fs'
-import { resolve } from 'path'
+import { join } from 'path'
 
-// read file content from root
-function readFile (...relSegments: string[]): string {
-  return fs.readFileSync(resolve(__dirname, '..', ...relSegments), 'utf8')
-}
+export const markdownDeckSource = fs.readFileSync(join(
+  __dirname, '../node_modules/markdown-deck/dist/markdown-deck.min.js',
+), 'utf8')
 
-export const markdownDeckSource = readFile(
-  'node_modules', 'markdown-deck', 'dist', 'markdown-deck.min.js'
-)
-
-export const editingJsSource = readFile('src', 'editing.js')
+export const editingJsSource = fs.readFileSync(join(__dirname, 'editing.js'))
 
 export interface IndexHTMLOptions {
   filename: string;
