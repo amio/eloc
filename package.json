@@ -8,7 +8,7 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "ncc build src/index.ts -m",
-    "now-build": "npm run build && node dist build deck.md",
+    "now-build": "npm run build && node dist build deck.md -t 'Eloquence cli'",
     "prepack": "npm run build"
   },
   "devDependencies": {
