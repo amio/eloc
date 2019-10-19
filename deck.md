@@ -37,6 +37,29 @@ $ eloc build deck.md --include "*.jpg"
 
 ---
 
+## Per Slide Styles
+
+```
+_write style tag within markdown_
+
+<style>
+  .slide { background: url(...) }
+  .content { filter: invert() }
+  code { opacity: 0.8 }
+</style>
+```
+
+<style>
+.slide {
+  background: url(https://el-capitan.now.sh);
+  background-size: cover;
+}
+.content { filter: invert() }
+code { opacity: 0.8 }
+</style>
+
+---
+
 Press <kbd>esc</kbd> to __edit me__ :)
 
 ---

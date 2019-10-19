@@ -12,7 +12,7 @@
     "prepack": "npm run build"
   },
   "devDependencies": {
-    "@types/fs-extra": "^8.0.0",
+    "@types/fs-extra": "^8.0.1",
     "@types/micromatch": "^3.1.0",
     "@types/mri": "^1.1.0",
     "@types/node": "^12.11.1",
@@ -21,7 +21,7 @@
     "fs-extra": "^8.1.0",
     "globby": "^10.0.1",
     "kleur": "^3.0.3",
-    "markdown-deck": "^1.4.1",
+    "markdown-deck": "^1.5.0",
     "micri": "^2.0.1",
     "micro-fork": "^2.0.0",
     "micromatch": "^4.0.2",
