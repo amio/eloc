@@ -4,7 +4,7 @@
 [![Install size][packagephobia-src]][packagephobia-href]
 [![License][license-src]][license-href]
 
-Eloquence cli.
+Eloquence cli. For presenters who (1) focus on writing, (2) present in a concise style.
 
 - Serve markdown as presentation
 - Static export
@@ -12,8 +12,9 @@ Eloquence cli.
 - Print view
 - Mobile view
 - Dark mode
+- Customization
 
-All of this in a 1.24MB cli. Checkout https://eloc.now.sh
+All of this in a 1MB cli. Checkout https://eloc.now.sh
 
 ### Presentation in Markdown ABC
 
@@ -45,7 +46,7 @@ then `eloc slides.md` gives you:
   Options
 
     -p, --port      Port (default: 3000)
-    -c, --css       Customization css
+    -c, --css       External css for customization
     -i, --include   Files for referencing in markdown (format: glob)
     -o, --out-dir   Output directory for build (default: public)
     -t, --title     HTML title (default: <markdown-filename>)
@@ -65,6 +66,20 @@ then `eloc slides.md` gives you:
     # Export presentation with images
     $ eloc build deck.md --include "*.jpg"
 ```
+
+### Customization
+
+- Use inline `<style />` tag in markdown for per-slide style:
+
+  ```
+  _write style tag within markdown_
+
+  <style>
+    .slide { background: url(...) }
+    .content { filter: invert() }
+    code { opacity: 0.8 }
+  </style>
+  ```
 
 ## See Also
 

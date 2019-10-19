@@ -37,7 +37,7 @@ $ eloc build deck.md --include "*.jpg"
 
 ---
 
-## Per Slide Styles
+## Customization
 
 ```
 _write style tag within markdown_

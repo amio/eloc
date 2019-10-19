@@ -18,7 +18,7 @@ const help = `
   Options
 
     -p, --port      ${dim('Port (default: 3000)')}
-    -c, --css       ${dim('Customization css')}
+    -c, --css       ${dim('External css for customization')}
     -i, --include   ${dim('Files for referencing in markdown (format: glob)')}
     -o, --out-dir   ${dim('Output directory for build (default: public)')}
     -t, --title     ${dim('HTML title (default: <markdown-filename>)')}
