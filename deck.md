@@ -51,7 +51,7 @@ _write style tag within markdown_
 
 <style>
 .slide {
-  background: url(https://el-capitan.now.sh);
+  background: url(https://el-capitan.now.sh) center;
   background-size: cover;
 }
 .content { filter: invert() }
