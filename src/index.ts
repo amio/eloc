@@ -5,6 +5,7 @@ import { bold, dim, green } from 'kleur'
 
 import serve from './serve'
 import build from './build'
+import init from './init'
 
 const help = `
   ${bold('eloc')} - Elequence cli
@@ -66,6 +67,8 @@ if (options.help) {
   serve(params[1], { ...options, open: true })
 } else if (params.length === 2 && params[0] === 'build') {
   build(params[1], options)
+} else if (params.length === 2 && params[0] === 'init') {
+  init(params[1], options)
 } else {
   console.info(help)
 }

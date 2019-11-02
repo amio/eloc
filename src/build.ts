@@ -19,9 +19,6 @@ export default async function build (markdownFile: string, options: BuildOptions
   const filename = basename(filepath)
   const dir = dirname(filepath)
 
-  // ensure dest dir
-  await fse.emptyDir(dest)
-
   // copy files
   const userAssets = [markdownFile]
     .concat(include as string)
