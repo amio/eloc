@@ -1,6 +1,14 @@
 import fs from 'fs'
 import { join } from 'path'
 
+const { version } = require(join(__dirname, '../package.json'))
+
+declare global {
+  interface Window {
+    markdownSrc: string | null;
+  }
+}
+
 export const markdownDeckSource = fs.readFileSync(join(
   __dirname, '../node_modules/markdown-deck/dist/markdown-deck.min.js',
 ), 'utf8')
@@ -14,10 +22,10 @@ export interface IndexHTMLOptions {
   css?: string;
 }
 
-export function createIndexHTML ({filename, title, edit, css}: IndexHTMLOptions) {
+export function createIndexHTML ({ filename, title, edit, css }: IndexHTMLOptions) {
   const cssAttribute = css ? `css="${css}"` : ''
 
-  const scriptsContent = [
+  const scriptContent = [
     markdownDeckSource,
     edit && editingJsSource,
   ].join(';')
@@ -31,11 +39,29 @@ export function createIndexHTML ({filename, title, edit, css}: IndexHTMLOptions)
       <title>${title || filename}</title>
       <style>
         html, body { height: 100%; margin: 0 }
+
+        .toast { background-color: #444; color: #fff; text-align: left; white-space: nowrap }
+        .toast { font: 16px/30px sans-serif; min-width: 300px; padding: 5px 1em; border-radius: 6px }
+        .toast { position: fixed; left: 10px; animation: toast 2s }
+        .toast.success { background-color: #3B6 }
+        .toast.error { background-color: #E54 }
+
+        @keyframes toast {
+          from { bottom: -10px; opacity: 0 }
+          10% { bottom: 10px; opacity: 1 }
+          90% { bottom: 10px; opacity: 1 }
+          to { bottom: -10px; opacity: 0 }
+        }
       </style>
     </head>
     <body>
-      <markdown-deck src="${filename}" ${cssAttribute} hotkey hashsync></markdown-deck>
-      <script>${scriptsContent}</script>
+      <markdown-deck ${cssAttribute} hotkey hashsync></markdown-deck>
+      <script>
+        console.info('Built with eloc-cli (v${version})')
+        const deck = document.querySelector('markdown-deck')
+        deck.src = new URL(document.location).searchParams.get('src') || "${filename}"
+      </script>
+      <script>${scriptContent}</script>
     </body>
   </html>`
 }

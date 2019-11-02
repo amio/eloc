@@ -104,7 +104,7 @@ function handleSave (filePath: string, verboseLog: typeof console.info) {
     try {
       const { markdown } = await json(req) as any
       fs.writeFileSync(filePath, markdown)
-      res.end(`Saved to "${filePath}"`)
+      res.end(`Saved to "${filePath}" (${markdown.length} Bytes)`)
 
       verboseLog(
         `Saved to ${underline(basename(filePath))} (${markdown.length} Bytes)`,
