@@ -20,10 +20,12 @@ export interface IndexHTMLOptions {
   title?: string;
   edit?: true;
   css?: string;
+  progress?: boolean;
 }
 
-export function createIndexHTML ({ filename, title, edit, css }: IndexHTMLOptions) {
+export function createIndexHTML ({ filename, title, edit, css, progress }: IndexHTMLOptions) {
   const cssAttribute = css ? `css="${css}"` : ''
+  const progressBarAttribute = progress ? 'progressBar' : ''
 
   const scriptContent = [
     markdownDeckSource,
@@ -55,7 +57,7 @@ export function createIndexHTML ({ filename, title, edit, css }: IndexHTMLOption
       </style>
     </head>
     <body>
-      <markdown-deck ${cssAttribute} hotkey hashsync></markdown-deck>
+      <markdown-deck ${cssAttribute} ${progressBarAttribute} hotkey hashsync></markdown-deck>
       <script>
         console.info('Built with eloc-cli (v${version})')
         const deck = document.querySelector('markdown-deck')

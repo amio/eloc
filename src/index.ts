@@ -25,6 +25,8 @@ const help = `
     -t, --title     ${dim('HTML title (default: <markdown-filename>)')}
     -q, --quiet     ${dim('Mute verbose logs')}
 
+    --progress      ${dim('Enable progress bar')}
+
   Flags
 
     -v, --version   ${dim('Display version number')}
@@ -44,7 +46,7 @@ const help = `
 
 const { _: params, ...options } = mri(process.argv.slice(2), {
   string: ['out-dir', 'include', 'title', 'css'],
-  boolean: ['help', 'version', 'quiet'],
+  boolean: ['help', 'version', 'quiet', 'progress-bar'],
   alias: {
     h: 'help',
     v: 'version',

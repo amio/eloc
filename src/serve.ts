@@ -21,12 +21,13 @@ interface ServeOptions {
   include?: string | string[];
   title?: string;
   css?: string;
+  progress?: boolean;
 }
 
 const { PORT = '5000' } = process.env
 
 export default function elocServe (markdownFile: string, options: ServeOptions) {
-  const { title, css, include } = options
+  const { title, css, include, progress } = options
   const filepath = resolve(process.cwd(), markdownFile)
   const filename = basename(filepath)
   const dir = dirname(filepath)
@@ -41,7 +42,7 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   }
 
   const handler = router()(
-    get('/', sendIndex({ filename, title, css })),
+    get('/', sendIndex({ filename, title, css, progress })),
     get('/*', serveUserAssets(dir, userAssets)),
     post('/api/save', handleSave(filepath, verboseLog))
   )
@@ -63,9 +64,9 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   })
 }
 
-function sendIndex ({ filename, title, css }: IndexHTMLOptions) {
+function sendIndex ({ filename, title, css, progress }: IndexHTMLOptions) {
   return (req: Request, res: Response) => {
-    const indexHTML = createIndexHTML({ filename, title, css, edit: true })
+    const indexHTML = createIndexHTML({ filename, title, css, edit: true, progress })
     res.setHeader('Content-Type', 'text/html')
     res.end(indexHTML)
   }
