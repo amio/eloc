@@ -8,7 +8,7 @@ import build from './build'
 import init from './init'
 
 const help = `
-  ${bold('eloc')} - Elequence cli
+  ${bold('eloc')} - Eloquence cli
 
   Usage
 
@@ -18,19 +18,16 @@ const help = `
 
   Options
 
-    -p, --port      ${dim('Port (default: 3000)')}
-    -c, --css       ${dim('External css for customization')}
-    -i, --include   ${dim('Files for referencing in markdown (format: glob)')}
-    -o, --out-dir   ${dim('Output directory for build (default: public)')}
-    -t, --title     ${dim('HTML title (default: <markdown-filename>)')}
-    -q, --quiet     ${dim('Mute verbose logs')}
-
-    --progress      ${dim('Enable progress bar')}
-
-  Flags
+    -p, --port <number>     ${dim('Port (default: 3000)')}
+    -c, --css <file>        ${dim('External css for customization')}
+    -i, --include <globs>   ${dim('Files for referencing in markdown')}
+    -o, --out-dir <dir>     ${dim('Output directory for build (default: public)')}
+    -t, --title <string>    ${dim('HTML title (default: <markdown-filename>)')}
+    --progress              ${dim('Enable progress bar')}
 
     -v, --version   ${dim('Display version number')}
     -h, --help      ${dim('Display usage information')}
+    -q, --quiet     ${dim('Mute verbose logs')}
 
   Examples
 

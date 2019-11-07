@@ -14,7 +14,7 @@ Eloquence cli. For presenters who (1) focus on writing, (2) present in a concise
 - Dark mode
 - Customization
 
-All of this in a 1MB cli. Checkout https://eloc.now.sh
+All of this in a [1MB][packagephobia-href] cli. Check out https://eloc.now.sh
 
 ### Presentation in Markdown ABC
 
@@ -35,7 +35,7 @@ then `eloc slides.md` gives you:
 ## Usage
 
 ```
-  eloc - Elequence cli
+  eloc - Eloquence cli
 
   Usage
 
@@ -67,9 +67,11 @@ then `eloc slides.md` gives you:
     $ eloc build deck.md --include "*.jpg"
 ```
 
-### Customization
+### Customization & Tips
 
-- Use inline `<style />` tag in markdown for per-slide style:
+- Use `--css` arg with external stylesheet, applied on every slide.
+
+- Use inline `<style />` in markdown for [per-slide customization](https://eloc.now.sh/#6):
 
   ```
   _write style tag within markdown_
@@ -80,6 +82,8 @@ then `eloc slides.md` gives you:
     code { opacity: 0.8 }
   </style>
   ```
+
+- http://math.now.sh/ is your friend for embedding math equation in slides.
 
 ## See Also
 
