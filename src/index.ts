@@ -46,7 +46,7 @@ const help = `
 
 const { _: params, ...options } = mri(process.argv.slice(2), {
   string: ['out-dir', 'include', 'title', 'css'],
-  boolean: ['help', 'version', 'quiet', 'progress-bar'],
+  boolean: ['help', 'version', 'quiet', 'progress'],
   alias: {
     h: 'help',
     v: 'version',
