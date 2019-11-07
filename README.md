@@ -69,9 +69,9 @@ then `eloc slides.md` gives you:
 
 ### Customization & Tips
 
-- Use `--css` arg with external stylesheet, applied on every slide.
+- Use `--css` arg with an external stylesheet, applied on every slide.
 
-- Use inline `<style />` in markdown for [per-slide customization](https://eloc.now.sh/#6):
+- Use inline `<style />` for [per-slide customization](https://eloc.now.sh/#6):
 
   ```
   _write style tag within markdown_
@@ -83,7 +83,7 @@ then `eloc slides.md` gives you:
   </style>
   ```
 
-- http://math.now.sh/ is your friend for embedding math equation in slides.
+- https://math.now.sh/ is your friend for embedding math equations in slides.
 
 ## See Also
 
