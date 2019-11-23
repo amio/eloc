@@ -7,12 +7,10 @@
 Eloquence cli. For presenters who (1) focus on writing, (2) present in a concise style.
 
 - Serve markdown as presentation
-- Static export
 - Live editor
-- Print view
-- Mobile view
-- Dark mode
-- Customization
+- Static export
+- Print view / Mobile view / Dark mode
+- Customizable with web standard
 
 All of this in a [1MB][packagephobia-href] cli. Check out https://eloc.now.sh
 
@@ -45,15 +43,16 @@ then `eloc slides.md` gives you:
 
   Options
 
-    -p, --port      Port (default: 3000)
-    -c, --css       External css for customization
-    -i, --include   Files for referencing in markdown (format: glob)
-    -o, --out-dir   Output directory for build (default: public)
-    -t, --title     HTML title (default: <markdown-filename>)
-    -q, --quiet     Mute verbose logs
+    -p, --port <number>     Port (default: 3000)
+    -c, --css <file>        External css for customization
+    -i, --include <globs>   Files for referencing in markdown
+    -o, --out-dir <dir>     Output directory for build (default: public)
+    -t, --title <string>    HTML title (default: <markdown-filename>)
+    -b, --progress-bar      Enable progress bar
 
-    -h, --help      Display usage information
-    -v, --version   Display version number
+    -q, --quiet             Mute verbose logs
+    -v, --version           Display version number
+    -h, --help              Display usage information
 
   Examples
 
@@ -61,7 +60,7 @@ then `eloc slides.md` gives you:
     $ eloc deck.md
 
     # Create & open "new-deck.md" as presentation in browser
-    $ eloc new-deck.md
+    $ eloc open new-deck.md
 
     # Export presentation with images
     $ eloc build deck.md --include "*.jpg"
@@ -83,11 +82,16 @@ then `eloc slides.md` gives you:
   </style>
   ```
 
-- https://math.now.sh/ is your friend for embedding math equations in slides.
+- https://math.now.sh/ is your friend for embedding math equations.
 
 ## See Also
 
 - [markdown-deck](https://github.com/amio/markdown-deck): a web component for presenters
+
+## Prior Art
+
+- [mdx-deck](https://github.com/jxnblk/mdx-deck) - If you want to enhance slides with React, this is the one.
+- [slides.com](https://slides.com) - Beautiful and powerful, the final choice for full featured presentation.
 
 [npm-src]: https://badgen.net/npm/v/eloc
 [npm-href]: https://www.npmjs.com/package/eloc
