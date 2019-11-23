@@ -1,7 +1,6 @@
 import fs from 'fs'
 import http from 'http'
 import { resolve } from 'path'
-// @ts-ignore
 import { router, get, post } from 'micro-fork'
 import { json } from 'micri'
 import open from 'open'
