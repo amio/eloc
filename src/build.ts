@@ -21,7 +21,7 @@ export default async function build (markdownFile: string, options: BuildOptions
   const dir = dirname(filepath)
 
   // copy files
-  const userAssets = [markdownFile]
+  const userAssets = [filename]
     .concat(include as string)
     .concat(css as string)
     .filter(Boolean)
