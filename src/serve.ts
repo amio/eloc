@@ -1,7 +1,6 @@
 import fs from 'fs'
 import http from 'http'
-import { resolve, basename, dirname } from 'path'
-import micromatch from 'micromatch'
+import { resolve } from 'path'
 // @ts-ignore
 import { router, get, post } from 'micro-fork'
 import { json } from 'micri'
@@ -18,7 +17,6 @@ interface ServeOptions {
   port?: number;
   open?: boolean;
   quiet?: boolean;
-  include?: string | string[];
   title?: string;
   css?: string;
   progress?: boolean;
@@ -27,24 +25,16 @@ interface ServeOptions {
 const { PORT = '5000' } = process.env
 
 export default function elocServe (markdownFile: string, options: ServeOptions) {
-  const { title, css, include, progress } = options
-  const filepath = resolve(process.cwd(), markdownFile)
-  const filename = basename(filepath)
-  const dir = dirname(filepath)
-
-  const userAssets: string[] = [markdownFile]
-    .concat(include as string | string[])
-    .concat(css as string)
-    .filter(Boolean)
+  const { title, css, progress } = options
 
   const verboseLog = (...msg: Array<any>) => {
     options.quiet || console.info(' ', ...msg)
   }
 
   const handler = router()(
-    get('/', sendIndex({ filename, title, css, progress })),
-    get('/*', serveUserAssets(dir, userAssets)),
-    post('/api/save', handleSave(filepath, verboseLog))
+    get('/', sendIndex({ filename: markdownFile, title, css, progress })),
+    get('/*', serveDir(process.cwd())),
+    post('/api/save', handleSave(markdownFile, verboseLog))
   )
 
   const server = http.createServer(handler)
@@ -56,7 +46,7 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
     console.info(`\n  Presenting at ${bold(url)}\n`)
 
     verboseLog(dim(' *'), `[${cyan('ESC')}] to toggle editor`)
-    verboseLog(dim(' *'), `[${cyan('CMD+S')}/${cyan('CTRL+S')}] to save to ${underline(filename)}\n`)
+    verboseLog(dim(' *'), `[${cyan('CMD+S')}/${cyan('CTRL+S')}] to save to ${underline(markdownFile)}\n`)
 
     options.open && open(url)
   }).on('error', (error: NodeJS.ErrnoException) => {
@@ -77,30 +67,14 @@ function serveDir (dir: string) {
     public: resolve(__dirname, dir),
     directoryListing: false,
     headers: [
-      { source: '**/*', headers : [{ key: 'Cache-Control', value: 'no-store' }] }
+      { source: '**/*.md', headers : [{ key: 'Cache-Control', value: 'no-store' }] },
+      { source: '**/*', headers : [{ key: 'Cache-Control', value: 'public, max-age: 3600' }] }
     ]
   })
 }
 
-function serveUserAssets (cwd: string, globs: string[]) {
-  const handler = serveDir(cwd)
-
-  return (req: Request, res: Response) => {
-    const filepath = (req.url || '').substr(1)
-    const included = globs.some(glob => micromatch.isMatch(filepath, glob))
-    included ? handler(req, res) : sendError(404)(req, res)
-  }
-}
-
-function sendError (code: number, message?: string) {
-  return (req: Request, res: Response) => {
-    message && (res.statusMessage = message)
-    res.statusCode = code
-    res.end()
-  }
-}
-
-function handleSave (filePath: string, verboseLog: typeof console.info) {
+function handleSave (file: string, verboseLog: typeof console.info) {
+  const filePath = resolve(process.cwd(), file)
   return async (req: Request, res: Response) => {
     try {
       const { markdown } = await json(req) as any
@@ -108,7 +82,7 @@ function handleSave (filePath: string, verboseLog: typeof console.info) {
       res.end(`Saved to "${filePath}" (${markdown.length} Bytes)`)
 
       verboseLog(
-        `Saved to ${underline(basename(filePath))} (${markdown.length} Bytes)`,
+        `Saved to ${underline(file)} (${markdown.length} Bytes)`,
         dim(new Date().toLocaleTimeString())
       )
     } catch (e) {
