@@ -20,12 +20,12 @@ export interface IndexHTMLOptions {
   title?: string;
   edit?: true;
   css?: string;
-  progress?: boolean;
+  progressBar?: boolean;
 }
 
-export function createIndexHTML ({ filename, title, edit, css, progress }: IndexHTMLOptions) {
+export function createIndexHTML ({ filename, title, edit, css, progressBar }: IndexHTMLOptions) {
   const cssAttribute = css ? `css="${css}"` : ''
-  const progressBarAttribute = progress ? 'progressBar' : ''
+  const progressBarAttribute = progressBar ? 'progressBar' : ''
 
   const scriptContent = [
     markdownDeckSource,

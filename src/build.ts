@@ -9,11 +9,11 @@ interface BuildOptions {
   'include'?: string;
   'title'?: string;
   'css'?: string;
-  'progress'?: boolean;
+  'progress-bar'?: boolean;
 }
 
 export default async function build (markdownFile: string, options: BuildOptions) {
-  const { 'out-dir': out = 'public', title, include, css, progress } = options
+  const { 'out-dir': out = 'public', title, include, css, 'progress-bar': progressBar } = options
   const dest = join(process.cwd(), out)
 
   const filepath = join(process.cwd(), markdownFile)
@@ -28,7 +28,7 @@ export default async function build (markdownFile: string, options: BuildOptions
   await globCopy(userAssets, dir, dest)
 
   // write index.html
-  const indexHTML = createIndexHTML({ filename, title, css, progress })
+  const indexHTML = createIndexHTML({ filename, title, css, progressBar })
   await fse.outputFile(join(dest, 'index.html'), indexHTML)
 }
 

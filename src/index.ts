@@ -23,11 +23,11 @@ const help = `
     -i, --include <globs>   ${dim('Files for referencing in markdown')}
     -o, --out-dir <dir>     ${dim('Output directory for build (default: public)')}
     -t, --title <string>    ${dim('HTML title (default: <markdown-filename>)')}
-    --progress              ${dim('Enable progress bar')}
+    -b, --progress-bar      ${dim('Enable progress bar')}
 
-    -v, --version   ${dim('Display version number')}
-    -h, --help      ${dim('Display usage information')}
-    -q, --quiet     ${dim('Mute verbose logs')}
+    -q, --quiet             ${dim('Mute verbose logs')}
+    -v, --version           ${dim('Display version number')}
+    -h, --help              ${dim('Display usage information')}
 
   Examples
 
@@ -43,7 +43,7 @@ const help = `
 
 const { _: params, ...options } = mri(process.argv.slice(2), {
   string: ['out-dir', 'include', 'title', 'css'],
-  boolean: ['help', 'version', 'quiet', 'progress'],
+  boolean: ['help', 'version', 'quiet', 'progress-bar'],
   alias: {
     h: 'help',
     v: 'version',
@@ -52,7 +52,8 @@ const { _: params, ...options } = mri(process.argv.slice(2), {
     t: 'title',
     q: 'quiet',
     p: 'port',
-    c: 'css'
+    c: 'css',
+    b: 'progress-bar'
   }
 })
 
