@@ -30,6 +30,12 @@ then `eloc slides.md` gives you:
 
 <p align="center"><img src="https://eloc-screenshot.now.sh" height="420px" /></p>
 
+## Install
+
+```bash
+npm install -g eloc
+```
+
 ## Usage
 
 ```
