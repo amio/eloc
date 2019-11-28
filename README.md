@@ -74,7 +74,7 @@ npm install -g eloc
 
 ### Customization & Tips
 
-- Use `--css` arg with an external stylesheet, applied on every slide.
+- Use `--css` arg with an external stylesheet, which will be applied on every slide.
 
 - Use inline `<style />` for [per-slide customization](https://eloc.now.sh/#6):
 

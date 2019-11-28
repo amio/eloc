@@ -2,6 +2,12 @@
 
 _the eloquence cli_
 
+<div>-></div>
+
+<style>
+  p + div { color: #CCC }
+</style>
+
 ---
 
 #### "True __eloquence__,<br /> does not consist in saying great things<br/> in a sublime style,
@@ -11,6 +17,18 @@ _the eloquence cli_
 #### but in a simple style."
 
 _-- Oliver Goldsmith_
+
+---
+
+### Meet `eloc`
+
+---
+
+A markdown presentation authoring cli  
+for presenters who
+
+1. __focus__ on writing
+2. present in a __concise__ style
 
 ---
 
