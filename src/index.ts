@@ -17,7 +17,7 @@ const help = `
 
   Options
 
-    -p, --port <number>     ${dim('Port (default: 3000)')}
+    -p, --port <number>     ${dim('Port (default: 5000)')}
     -c, --css <file>        ${dim('External css for customization')}
     -i, --include <globs>   ${dim('Files for referencing in markdown')}
     -o, --out-dir <dir>     ${dim('Output directory for build (default: public)')}
