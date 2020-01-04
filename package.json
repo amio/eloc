@@ -16,7 +16,7 @@
     "@types/fs-extra": "^8.0.1",
     "@types/micromatch": "^3.1.1",
     "@types/mri": "^1.1.0",
-    "@types/node": "^12.12.12",
+    "@types/node": "^13.1.4",
     "@types/serve-handler": "^6.1.0",
     "@zeit/ncc": "^0.20.5",
     "fs-extra": "^8.1.0",
@@ -27,9 +27,9 @@
     "micro-fork": "^3.0.0",
     "micromatch": "^4.0.2",
     "mri": "^1.1.4",
-    "nodemon": "^2.0.1",
+    "nodemon": "^2.0.2",
     "open": "^7.0.0",
     "serve-handler": "^6.1.2",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.4"
   }
 }
