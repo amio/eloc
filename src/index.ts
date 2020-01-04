@@ -24,6 +24,7 @@ const help = `
     -o, --out-dir <dir>     ${dim('Output directory for build (default: public)')}
     -t, --title <string>    ${dim('HTML title (default: <markdown-filename>)')}
     -b, --progress-bar      ${dim('Enable progress bar')}
+    -d, --dark              ${dim('Enable dark theme')}
 
     -q, --quiet             ${dim('Mute verbose logs')}
     -v, --version           ${dim('Display version number')}
@@ -43,7 +44,7 @@ const help = `
 
 const { _: params, ...options } = mri(process.argv.slice(2), {
   string: ['out-dir', 'include', 'title', 'css'],
-  boolean: ['help', 'version', 'quiet', 'progress-bar'],
+  boolean: ['help', 'version', 'quiet', 'progress-bar', 'dark'],
   alias: {
     h: 'help',
     v: 'version',
@@ -53,6 +54,7 @@ const { _: params, ...options } = mri(process.argv.slice(2), {
     q: 'quiet',
     p: 'port',
     c: 'css',
+    d: 'dark',
     b: 'progress-bar'
   }
 })
