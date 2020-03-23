@@ -19,7 +19,7 @@
     "@types/node": "^13.9.0",
     "@types/serve-handler": "^6.1.0",
     "@zeit/ncc": "^0.21.1",
-    "fs-extra": "^8.1.0",
+    "fs-extra": "^9.0.0",
     "globby": "^11.0.0",
     "kleur": "^3.0.3",
     "markdown-deck": "^1.6.7",
