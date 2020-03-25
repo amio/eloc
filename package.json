@@ -1,6 +1,6 @@
 {
   "name": "eloc",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "1MB cli for markdown presentation authoring",
   "repository": "amio/eloc",
   "license": "MIT",
