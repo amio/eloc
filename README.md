@@ -90,6 +90,19 @@ npm install -g eloc
 
 - https://math.now.sh/ is your friend for embedding math equations.
 
+### Deploy to now
+
+in 1 minute.
+
+Assume you alread had an `index.md` wrote with `eloc open index.md`, then:
+
+```bash
+echo '{"scripts":"build":"eloc build index.md"}}' > package.json
+echo 'node_modules' > .gitignore
+npm i -D eloc
+now -c --prod
+```
+
 ## See Also
 
 - [markdown-deck](https://github.com/amio/markdown-deck): a web component for presenters
