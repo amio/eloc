@@ -98,7 +98,7 @@ Assume you alread had an `index.md` wrote with `eloc open index.md`, then:
 
 ```bash
 echo '{"scripts":"build":"eloc build index.md"}}' > package.json
-echo 'node_modules' > .gitignore
+echo '.now\nnode_modules' > .gitignore
 npm i -D eloc
 now -c --prod
 ```
