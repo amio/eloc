@@ -23,9 +23,11 @@ export default async function build (markdownFile: string, options: BuildOptions
 
   // copy files
   const userAssets = [filename]
+    .concat(['*.png', '*.svg', '*.gif', '*.jpg']) // auto include images
     .concat(include as string)
     .concat(css as string)
     .filter(Boolean)
+
   await globCopy(userAssets, dir, dest)
 
   // write index.html
