@@ -64,9 +64,9 @@ if (options.help) {
   console.info(require('../package.json').version)
 } else if (params.length === 1) {
   serve(params[0], options)
-} else if (params.length === 2 && params[0] === 'open') {
+} else if (params[0] === 'open' && params.length > 1) {
   serve(params[1], { ...options, open: true })
-} else if (params.length === 2 && params[0] === 'build') {
+} else if (params[0] === 'build' && params.length > 1) {
   build(params[1], options)
 } else {
   console.info(help)
