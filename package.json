@@ -13,7 +13,7 @@
     "prepack": "npm run build"
   },
   "devDependencies": {
-    "@types/fs-extra": "^8.1.0",
+    "@types/fs-extra": "^9.0.0",
     "@types/micromatch": "^4.0.1",
     "@types/mri": "^1.1.0",
     "@types/node": "^13.11.1",
