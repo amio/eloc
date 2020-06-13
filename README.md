@@ -111,6 +111,7 @@ now -c --prod
 
 - [mdx-deck](https://github.com/jxnblk/mdx-deck) - If you want to enhance slides with React, this is the one.
 - [slides.com](https://slides.com) - Beautiful and powerful, the final choice for full featured presentation.
+- [big](https://github.com/tmcw/big) - The boldest style, for fan of [Takahashi method](https://en.wikipedia.org/wiki/Takahashi_method).
 
 [npm-src]: https://badgen.net/npm/v/eloc
 [npm-href]: https://www.npmjs.com/package/eloc

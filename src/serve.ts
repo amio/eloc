@@ -67,7 +67,7 @@ function serveDir (dir: string) {
     public: resolve(__dirname, dir),
     directoryListing: false,
     headers: [
-      { source: '**/*', headers : [{ key: 'Cache-Control', value: 'no-store' }] }
+      { source: '**/*', headers : [{ key: 'Cache-Control', value: 'no-cache' }] }
     ]
   })
 }

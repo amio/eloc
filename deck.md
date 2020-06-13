@@ -2,12 +2,6 @@
 
 _the eloquence cli_
 
-<div>-></div>
-
-<style>
-  p + div { color: #CCC }
-</style>
-
 ---
 
 #### "True __eloquence__,<br /> does not consist in saying great things<br/> in a sublime style,
@@ -16,15 +10,16 @@ _the eloquence cli_
 
 #### but in a simple style."
 
-_-- Oliver Goldsmith_
+_— Oliver Goldsmith_
 
 ---
 
-### Meet `eloc`
+## Meet `eloc`
+
+A markdown presentation authoring cli
 
 ---
-
-A markdown presentation authoring cli  
+  
 for presenters who
 
 1. __focus__ on writing
@@ -41,7 +36,7 @@ $ eloc deck.md
 # Create & serve "new-deck.md" as presentation
 $ eloc new-deck.md
 
-# Export presentation with images
+# Export presentation to html with images
 $ eloc build deck.md --include "*.jpg"
 ```
 
@@ -55,13 +50,17 @@ $ eloc build deck.md --include "*.jpg"
 
 ---
 
+Press <kbd>esc</kbd> to __edit me__ :)
+
+---
+
 ## Customization
 
 ```
-_write style tag within markdown_
+### Write inline style within markdown
 
 <style>
-  .slide { background: url(...) }
+  .slide { background: url(...) center; background-size: cover }
   .content { filter: invert() }
   code { opacity: 0.8 }
 </style>
@@ -78,8 +77,6 @@ code { opacity: 0.8 }
 
 ---
 
-Press <kbd>esc</kbd> to __edit me__ :)
-
----
-
 https://github.com/amio/eloc
+
+[![](https://badgen.net/badge/github/amio%2Feloc/black?scale=2&icon&label)](https://github.com/amio/eloc)
