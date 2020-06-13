@@ -49,12 +49,13 @@ npm install -g eloc
 
   Options
 
-    -p, --port <number>     Port (default: 3000)
+    -p, --port <number>     Port (default: 5000)
     -c, --css <file>        External css for customization
     -i, --include <globs>   Files for referencing in markdown
     -o, --out-dir <dir>     Output directory for build (default: public)
     -t, --title <string>    HTML title (default: <markdown-filename>)
     -b, --progress-bar      Enable progress bar
+    -d, --dark              Enable dark theme
 
     -q, --quiet             Mute verbose logs
     -v, --version           Display version number
@@ -92,14 +93,11 @@ npm install -g eloc
 
 ### Deploy to now
 
-in 1 minute.
-
 Assume you alread had an `index.md` wrote with `eloc open index.md`, then:
 
 ```bash
 echo '{"scripts":"build":"eloc build index.md"}}' > package.json
 echo '.now\nnode_modules' > .gitignore
-npm i -D eloc
 now -c --prod
 ```
 
