@@ -77,6 +77,6 @@ code { opacity: 0.8 }
 
 ---
 
-https://github.com/amio/eloc
-
 [![](https://badgen.net/badge/github/amio%2Feloc/black?scale=2&icon&label)](https://github.com/amio/eloc)
+
+https://github.com/amio/eloc
