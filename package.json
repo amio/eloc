@@ -23,7 +23,7 @@
     "globby": "^11.0.1",
     "kleur": "^3.0.3",
     "markdown-deck": "^1.7.2",
-    "micri": "^3.0.1",
+    "micri": "^4.2.1",
     "micro-fork": "^3.0.0",
     "micromatch": "^4.0.2",
     "mri": "^1.1.4",
