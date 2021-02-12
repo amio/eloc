@@ -25,7 +25,7 @@
     "@vercel/ncc": "^0.27.0",
     "fs-extra": "^9.0.1",
     "globby": "^11.0.1",
-    "kleur": "^3.0.3",
+    "kleur": "^4.1.4",
     "markdown-deck": "^1.7.2",
     "micri": "^3.0.1",
     "micro-fork": "^3.0.0",
