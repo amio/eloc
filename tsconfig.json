@@ -5,6 +5,7 @@
     "lib": ["esnext", "dom"],
 
     "outDir": "dist",
+    "composite": true,
 
     "strict": true,
     "sourceMap": false,
@@ -17,6 +18,10 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true
   },
+
   "include": ["src"],
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "references": [
+    { "path": "./packages/markdown-deck" }
+  ]
 }
