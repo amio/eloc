@@ -5,6 +5,7 @@
     "lib": ["esnext", "dom"],
 
     "outDir": "dist",
+    "composite": true,
 
     "sourceMap":true,
     "allowJs":true,

@@ -65,6 +65,8 @@ export function createIndexHTML ({ filename, title, edit, css, dark, progressBar
         const deck = document.querySelector('markdown-deck')
         deck.src = new URL(document.location).searchParams.get('src') || "${filename}"
       </script>
+      <script>window.module = {}</script>
+      <script>window.__dirname = ''</script>
       <script>${scriptContent}</script>
     </body>
   </html>`
