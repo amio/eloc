@@ -90,7 +90,6 @@ export class MarkdownDeck extends LitElement {
         @keyup=${this._handleEditing}
         @input=${this._handleEditing}
         @click=${this._handleEditing}
-        @paste=${this._handlePaste}
       >${this.markdown}</textarea>
     `
   }
@@ -254,28 +253,6 @@ export class MarkdownDeck extends LitElement {
     }
   }
 
-  _handlePaste = (ev: ClipboardEvent) => {
-    const { files, items, types } = ev.clipboardData
-
-    const plainText = ev.clipboardData.getData('text/plain')
-
-    // handle pasted image
-    if (files.length && files[0].type.startsWith('image/')) {
-      const image = files[0]
-      const imageName = plainText
-
-      console.log(image, plainText);
-
-      // set pasted text to
-      const imageMarkdown = `![${imageName}](${imageName})`
-      // ev.clipboardData.setData('text/plain', imageMarkdown)
-      replaceTextAreaSelection(<HTMLTextAreaElement>ev.target, imageMarkdown)
-
-      console.log(imageMarkdown, ev.target);
-      ev.preventDefault()
-    }
-  }
-
   _handleResize = () => {
     this.requestUpdate()
   }
@@ -423,17 +400,6 @@ function trimIndent (text: string): string {
   return lines.map(line => line.replace(indentChars, '')).join('\n')
 }
 
-function replaceTextAreaSelection (textarea: HTMLTextAreaElement, replaceText: string) {
-  const { selectionStart, selectionEnd, value } = textarea
-
-  const textBefore = value.substring(0, selectionStart)
-  const textAfter  = value.substring(selectionEnd, value.length)
-  const mergedText = textBefore + replaceText + textAfter
-
-  textarea.value = mergedText
-  textarea.setSelectionRange(selectionStart, selectionStart + replaceText.length)
-}
-
 function setLocationHash (hash: any) {
   const hashString = '#' + String(hash)
 
@@ -521,16 +487,8 @@ function deckStyle (): CSSResult {
     }
 
     @media (max-width: 800px) {
-      #deck.editor .slide-column {
+      #deck.editing .slide {
         display: none;
-      }
-
-      #deck.editor .editor-column {
-        min-height: 50%;
-        display: grid;
-      }
-      #deck.editor {
-        display: grid;
       }
     }
 

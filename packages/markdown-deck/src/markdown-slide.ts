@@ -101,6 +101,7 @@ function slideStyle (theme: CSSResult, codeTheme: CSSResult): CSSResult {
       filter: invert(100%);
     }
     .slide.invert img {
+      /*  */
       filter: invert(100%);
     }
     .content {

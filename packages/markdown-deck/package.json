@@ -1,16 +1,16 @@
 {
   "name": "markdown-deck",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "description": "A web component for presenters",
   "repository": "amio/markdown-deck",
-  "main": "dist/markdown-deck.js",
+  "main": "dist/markdown-deck.min.js",
   "unpkg": "dist/markdown-deck.min.js",
   "license": "MIT",
   "scripts": {
-    "pretest": "tsc src/utils.ts --outDir dist",
-    "test": "tape test/*.js",
-    "start": "nodemon -w src -e js,ts -x 'npm run now-build && serve public'",
-    "build": "rm -rf dists/* && bili --format iife-min,cjs",
+    "test": "jest",
+    "prestart": "rm -rf dist",
+    "start": "nodemon -w src -e js,ts -x 'npm run build && serve .'",
+    "build": "esbuild src/index.ts --outfile=dist/markdown-deck.min.js --bundle --minify --sourcemap --format=iife",
     "build-deck": "rm -rf public && mkdir public && cp -R dist public && cp *.html deck.* public",
     "now-build": "npm run build && npm run build-deck",
     "prepack": "npm run build"
@@ -18,14 +18,15 @@
   "dependencies": {
     "lit-element": "^2.4.0",
     "lit-html": "^1.3.0",
+    "marked": "^2.0.0",
     "prismjs": "^1.22.0"
   },
   "devDependencies": {
-    "bili": "^4.10.1",
-    "marked": "^2.0.0",
+    "@types/jest": "^26.0.20",
+    "esbuild": "^0.8.44",
+    "jest": "^26.6.3",
     "nodemon": "^2.0.5",
-    "rollup-plugin-typescript2": "^0.29.0",
-    "tape": "^5.0.1",
-    "typescript": "^4.0.3"
+    "ts-jest": "^26.5.1",
+    "typescript": "^4.1.5"
   }
 }
