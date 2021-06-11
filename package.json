@@ -5,6 +5,7 @@
   "repository": "amio/eloc",
   "license": "MIT",
   "bin": "dist/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "bootstrap": "cd packages/markdown-deck && npm run build",
     "dev": "nodemon -w src -e js,ts -x npm run build",
