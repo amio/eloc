@@ -5,7 +5,9 @@ import { router, get, post } from 'micro-fork'
 import { json } from 'micri'
 import open from 'open'
 import serveHandler from 'serve-handler'
-import { bold, cyan, underline, dim } from 'kleur'
+import kleur from 'kleur'
+
+const { bold, cyan, underline, dim } = kleur
 
 import { createIndexHTML, IndexHTMLOptions } from './assets'
 

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { join } from 'path'
 
-const { version } = require(join(__dirname, '../package.json'))
+const { version } = require('../package.json')
 
 declare global {
   interface Window {

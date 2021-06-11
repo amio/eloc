@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
 import mri from 'mri'
-import { bold, dim, green } from 'kleur'
+import kleur from 'kleur'
 
 import serve from './serve'
 import build from './build'
+
+const { bold, dim, green } = kleur
 
 const help = `
   ${bold('eloc')} - Eloquence cli
