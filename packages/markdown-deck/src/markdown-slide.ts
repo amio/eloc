@@ -1,8 +1,8 @@
 import marked from 'marked'
-import { html, css, property, customElement } from 'lit-element'
-import { LitElement, CSSResult } from 'lit-element'
-import { unsafeHTML } from 'lit-html/directives/unsafe-html'
-import { classMap } from 'lit-html/directives/class-map'
+import { html, css, LitElement, CSSResultGroup } from 'lit'
+import { property, customElement } from 'lit/decorators.js'
+import { unsafeHTML } from 'lit/directives/unsafe-html'
+import { classMap } from 'lit/directives/class-map'
 
 import Prism from 'prismjs'
 import 'prismjs/components/prism-python'
@@ -88,7 +88,7 @@ function observeResize (elem: Element, cb: Function) {
   }
 }
 
-function slideStyle (theme: CSSResult, codeTheme: CSSResult): CSSResult {
+function slideStyle (theme: CSSResultGroup, codeTheme: CSSResultGroup): CSSResultGroup {
   return css`
     .slide {
       height: 100%;
