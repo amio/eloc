@@ -16,8 +16,6 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "lit-element": "^2.4.0",
-    "lit-html": "^1.3.0",
     "marked": "^2.0.0",
     "prismjs": "^1.22.0"
   },
@@ -25,6 +23,7 @@
     "@types/jest": "^26.0.20",
     "esbuild": "^0.12.1",
     "jest": "^27.0.4",
+    "lit": "^2.0.0-rc.2",
     "nodemon": "^2.0.5",
     "serve": "^12.0.0",
     "ts-jest": "^27.0.3",

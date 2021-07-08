@@ -1,7 +1,8 @@
-import { html, css, property, customElement, unsafeCSS } from 'lit-element'
-import { LitElement, CSSResult, TemplateResult, PropertyValues } from 'lit-element'
-import { classMap } from 'lit-html/directives/class-map'
-import { repeat } from 'lit-html/directives/repeat'
+import { html, css, unsafeCSS } from 'lit'
+import { LitElement, CSSResultGroup, TemplateResult, PropertyValues } from 'lit'
+import {property, customElement} from 'lit/decorators.js'
+import { classMap } from 'lit/directives/class-map'
+import { repeat } from 'lit/directives/repeat'
 
 import { splitMarkdownToPages, getRangeByIndex } from './utils'
 import interItalicFontCSS from './fonts/inter.italic.css'
@@ -425,7 +426,7 @@ function scrollTextareaTo (textarea: HTMLTextAreaElement, start: number) {
   textarea.scrollTop = expandScrollHeight - originalScrollHeight - 46
 }
 
-function deckStyle (): CSSResult {
+function deckStyle (): CSSResultGroup {
   return css`
     :host {
       display: block;

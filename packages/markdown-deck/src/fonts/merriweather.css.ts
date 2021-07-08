@@ -1,5 +1,3 @@
-import { css } from 'lit-element'
-
 export default `
 /* cyrillic-ext */
 @font-face {
