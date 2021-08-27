@@ -22,7 +22,7 @@
     "@types/mri": "^1.1.0",
     "@types/node": "^12.19.15",
     "@types/serve-handler": "^6.1.0",
-    "@vercel/ncc": "^0.28.6",
+    "@vercel/ncc": "^0.30.0",
     "fs-extra": "^10.0.0",
     "globby": "^11.0.1",
     "kleur": "^4.1.4",
