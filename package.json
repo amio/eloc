@@ -24,7 +24,7 @@
     "@types/serve-handler": "^6.1.0",
     "@vercel/ncc": "^0.28.6",
     "fs-extra": "^10.0.0",
-    "globby": "^11.0.1",
+    "globby": "^13.1.0",
     "kleur": "^4.1.4",
     "markdown-deck": "^1.7.2",
     "micri": "^4.3.0",
