@@ -20,9 +20,9 @@
     "prismjs": "^1.22.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.20",
+    "@types/jest": "^28.1.0",
     "esbuild": "^0.12.1",
-    "jest": "^27.0.4",
+    "jest": "^28.1.0",
     "lit": "^2.0.0-rc.2",
     "nodemon": "^2.0.5",
     "serve": "^12.0.0",
