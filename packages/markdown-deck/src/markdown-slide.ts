@@ -1,4 +1,4 @@
-import marked from 'marked'
+import { marked } from 'marked'
 import { html, css, LitElement, CSSResultGroup } from 'lit'
 import { property, customElement } from 'lit/decorators.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
