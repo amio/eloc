@@ -86,7 +86,7 @@ function handleSave (file: string, verboseLog: typeof console.info) {
         `Saved to ${underline(file)} (${markdown.length} Bytes)`,
         dim(new Date().toLocaleTimeString())
       )
-    } catch (e) {
+    } catch (e: any) {
       res.statusCode = 500
       res.end(e.message)
       console.error(e.message)
