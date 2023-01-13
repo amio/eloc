@@ -1,8 +1,8 @@
 import marked from 'marked'
 import { html, css, LitElement, CSSResultGroup } from 'lit'
 import { property, customElement } from 'lit/decorators.js'
-import { unsafeHTML } from 'lit/directives/unsafe-html'
-import { classMap } from 'lit/directives/class-map'
+import { unsafeHTML } from 'lit/directives/unsafe-html.js'
+import { classMap } from 'lit/directives/class-map.js'
 
 import Prism from 'prismjs'
 import 'prismjs/components/prism-python'

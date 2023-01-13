@@ -1,8 +1,8 @@
 import { html, css, unsafeCSS } from 'lit'
 import { LitElement, CSSResultGroup, TemplateResult, PropertyValues } from 'lit'
 import {property, customElement} from 'lit/decorators.js'
-import { classMap } from 'lit/directives/class-map'
-import { repeat } from 'lit/directives/repeat'
+import { classMap } from 'lit/directives/class-map.js'
+import { repeat } from 'lit/directives/repeat.js'
 
 import { splitMarkdownToPages, getRangeByIndex } from './utils'
 import interItalicFontCSS from './fonts/inter.italic.css'

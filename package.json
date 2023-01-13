@@ -10,7 +10,8 @@
     "dev": "nodemon -w src -e js,ts -x npm run build",
     "prebuild": "rm -rf dist",
     "build": "ncc build src/index.ts -m",
-    "now-build": "npm run bootstrap && npm run build && node dist build deck.md -t 'Eloquence cli'",
+    "postbuild": "cp src/editing.js dist",
+    "now-build": "npm run bootstrap && npm run build && node dist/index.js build deck.md -t 'Eloquence cli'",
     "prepack": "npm run build"
   },
   "workspaces": [
