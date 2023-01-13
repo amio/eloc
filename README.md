@@ -39,7 +39,7 @@ npm install -g eloc
 ## Usage
 
 ```
-  eloc - Eloquence cli
+  eloc - The eloquent cli
 
   Usage
 

@@ -115,7 +115,7 @@ https://github.com/amio/markdown-deck
 
 One More Thing
 
-## The Eloquence CLI
+## The Eloquent CLI
 
 ```
 npm install -g eloc

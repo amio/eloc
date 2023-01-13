@@ -9,7 +9,7 @@ import build from './build'
 const { bold, dim, green } = kleur
 
 const help = `
-  ${bold('eloc')} - Eloquence cli
+  ${bold('eloc')} - The eloquent cli
 
   Usage
 
