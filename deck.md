@@ -1,6 +1,6 @@
 ## `eloc`
 
-_the eloquence cli_
+_the eloquent cli_
 
 ---
 
