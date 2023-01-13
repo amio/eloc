@@ -18,13 +18,13 @@
     "./packages/*"
   ],
   "devDependencies": {
-    "@types/fs-extra": "^9.0.1",
+    "@types/fs-extra": "^11.0.1",
     "@types/micromatch": "^4.0.1",
     "@types/mri": "^1.1.0",
     "@types/node": "^12.19.15",
     "@types/serve-handler": "^6.1.0",
     "@vercel/ncc": "^0.36.0",
-    "fs-extra": "^10.0.0",
+    "fs-extra": "^11.1.0",
     "globby": "^11.0.1",
     "kleur": "^4.1.4",
     "markdown-deck": "^1.7.2",
