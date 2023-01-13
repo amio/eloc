@@ -89,17 +89,7 @@ npm install -g eloc
   </style>
   ```
 
-- https://math.now.sh/ is your friend for embedding math equations.
-
-### Deploy to now
-
-Assume you alread had an `index.md` wrote with `eloc open index.md`, then:
-
-```bash
-echo '{"scripts":"build":"eloc build index.md"}}' > package.json
-echo '.now\nnode_modules' > .gitignore
-now -c --prod
-```
+- https://math.vercel.app/ is your friend for embedding math equations.
 
 ## See Also
 
