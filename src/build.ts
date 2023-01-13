@@ -1,5 +1,5 @@
 import { join, basename, dirname } from 'path'
-import globby from 'globby'
+import { globby } from 'globby'
 import fse from 'fs-extra'
 
 import { createIndexHTML } from './assets'
