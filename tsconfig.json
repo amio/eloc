@@ -17,7 +17,8 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "forceConsistentCasingInFileNames": true
   },
 
   "include": ["src"],
