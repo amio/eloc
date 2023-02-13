@@ -10,13 +10,16 @@
     "dev": "nodemon -w src -e js,ts -x npm run build",
     "prebuild": "rm -rf dist",
     "build": "esbuild --bundle src/index.ts --outdir=dist --platform=node --minify",
-    "postbuild": "cp src/editing.js dist",
+    "postbuild": "npm run bootstrap && cp src/editing.js dist",
     "now-build": "npm run bootstrap && npm run build && node dist/index.js build deck.md -t 'The eloquent cli'",
     "prepack": "npm run build"
   },
   "workspaces": [
     "./packages/*"
   ],
+  "dependencies": {
+    "markdown-deck": "^1.7.2"
+  },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
     "@types/micromatch": "^4.0.1",
@@ -27,7 +30,6 @@
     "fs-extra": "^11.1.0",
     "globby": "^13.1.3",
     "kleur": "^4.1.4",
-    "markdown-deck": "^1.7.2",
     "micri": "^4.3.0",
     "micro-fork": "^3.0.0",
     "micromatch": "^4.0.2",
