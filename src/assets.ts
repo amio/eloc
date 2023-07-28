@@ -10,7 +10,7 @@ declare global {
 }
 
 export const markdownDeckSource = fs.readFileSync(join(
-  __dirname, '../node_modules/markdown-deck/dist/markdown-deck.min.js',
+  __dirname, '../packages/markdown-deck/dist/markdown-deck.min.js',
 ), 'utf8')
 
 export const editingJsSource = fs.readFileSync(join(__dirname, 'editing.js'))
