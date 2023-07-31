@@ -9,7 +9,8 @@
   "scripts": {
     "test": "jest",
     "prestart": "rm -rf dist",
-    "start": "nodemon -w src -e js,ts -x 'npm run build && serve .'",
+    "preview": "serve .",
+    "start": "npm run build -- --watch",
     "build": "esbuild src/index.ts --outfile=dist/markdown-deck.min.js --bundle --minify --sourcemap --format=iife",
     "build-deck": "rm -rf public && mkdir public && cp -R dist public && cp *.html deck.* public",
     "now-build": "npm run build && npm run build-deck",
@@ -21,12 +22,11 @@
   },
   "devDependencies": {
     "@types/jest": "^29.2.5",
-    "esbuild": "^0.18.10",
+    "esbuild": "^0.18.17",
     "jest": "^29.3.1",
     "lit": "^2.6.1",
-    "nodemon": "^2.0.5",
     "serve": "^14.1.2",
     "ts-jest": "^29.0.5",
-    "typescript": "^5.0.2"
+    "typescript": "^5.1.6"
   }
 }
