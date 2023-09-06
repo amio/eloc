@@ -23,7 +23,7 @@
     "@types/mri": "^1.1.0",
     "@types/node": "^16.18.11",
     "@types/serve-handler": "^6.1.0",
-    "@vercel/ncc": "^0.36.0",
+    "@vercel/ncc": "^0.38.0",
     "esbuild": "^0.19.1",
     "fs-extra": "^11.1.0",
     "globby": "^13.1.3",
