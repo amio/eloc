@@ -33,7 +33,7 @@
     "micro-fork": "^3.0.0",
     "micromatch": "^4.0.2",
     "mri": "^1.1.4",
-    "open": "^8.0.2",
+    "open": "^10.0.0",
     "serve-handler": "^6.1.3",
     "typescript": "^5.1.6"
   },
