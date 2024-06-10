@@ -24,7 +24,7 @@
     "@types/node": "^16.18.11",
     "@types/serve-handler": "^6.1.0",
     "@vercel/ncc": "^0.38.1",
-    "esbuild": "^0.19.1",
+    "esbuild": "^0.21.5",
     "fs-extra": "^11.1.0",
     "globby": "^14.0.0",
     "kleur": "^4.1.4",
