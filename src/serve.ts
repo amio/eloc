@@ -6,6 +6,7 @@ import { json } from 'micri'
 import open from 'open'
 import serveHandler from 'serve-handler'
 import kleur from 'kleur'
+import net from 'net'
 
 const { bold, cyan, underline, dim } = kleur
 
@@ -26,24 +27,6 @@ interface ServeOptions {
 
 const { PORT = '5000' } = process.env
 
-async function tryBindPort(server: http.Server, initialPort: number, maxAttempts = 100): Promise<number> {
-  for (let port = initialPort; port < initialPort + maxAttempts; port++) {
-    try {
-      await new Promise((resolve, reject) => {
-        server.once('error', reject)
-        server.listen(port, () => {
-          server.removeListener('error', reject)
-          resolve(port)
-        })
-      })
-      return port
-    } catch (err: any) {
-      if (err.code !== 'EADDRINUSE') throw err
-      server.removeAllListeners()
-    }
-  }
-  throw new Error(`Unable to find an available port after ${maxAttempts} attempts`)
-}
 
 export default async function elocServe (markdownFile: string, options: ServeOptions) {
   const { title, css, dark, 'progress-bar': progressBar } = options
@@ -62,16 +45,18 @@ export default async function elocServe (markdownFile: string, options: ServeOpt
   const initialPort = options.port || parseInt(PORT, 10)
 
   try {
-    const port = await tryBindPort(server, initialPort)
+    const port = await findAvailablePort(initialPort)
     const url = `http://localhost:${port}`
 
-    console.info(`\n  Presenting at ${bold(url)}\n`)
+    server.listen(port, () => {
+      console.info(`\n  Presenting at ${bold(url)}\n`)
 
-    verboseLog(`SHORTCUTS`)
-    verboseLog(dim(' *'), `[${cyan('ESC')}] to toggle editor`)
-    verboseLog(dim(' *'), `[${cyan('CMD+S')}/${cyan('CTRL+S')}] to save to ${underline(markdownFile)}\n`)
+      verboseLog(`SHORTCUTS`)
+      verboseLog(dim(' *'), `[${cyan('ESC')}] to toggle editor`)
+      verboseLog(dim(' *'), `[${cyan('CMD+S')}/${cyan('CTRL+S')}] to save to ${underline(markdownFile)}\n`)
 
-    options.open && open(url)
+      options.open && open(url)
+    })
   } catch (error: any) {
     console.error(error.message)
     process.exit(1)
@@ -114,4 +99,22 @@ function handleSave (file: string, verboseLog: typeof console.info) {
       console.error(e.message)
     }
   }
+}
+
+async function findAvailablePort(startPort: number, maxAttempts = 100): Promise<number> {
+  for (let port = startPort; port < startPort + maxAttempts; port++) {
+    if (await checkPort(port)) {
+      return port
+    }
+  }
+  throw new Error('No available ports found')
+}
+
+function checkPort(port: number): Promise<boolean> {
+  return new Promise(resolve => {
+    const tester = net.createServer()
+      .once('error', () => resolve(false))
+      .once('listening', () => tester.close(() => resolve(true)))
+      .listen(port)
+  })
 }
