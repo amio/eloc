@@ -1,6 +1,13 @@
-## `eloc`
+## `eloc`  
 
-_the eloquent cli_
+#### The eloquent cli
+
+_press [space] to start_
+
+<style>
+h4 { font-weight: 300 !important; margin-top: -0.5em !important }
+em { opacity: 0.2; font-size: 0.5em; text-transform: uppercase }
+</style>
 
 ---
 
