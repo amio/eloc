@@ -6,12 +6,11 @@
   "license": "MIT",
   "bin": "dist/index.js",
   "scripts": {
-    "bootstrap": "npm run build -w markdown-deck",
-    "dev": "npm run build -- --watch",
-    "prebuild": "rm -rf dist",
+    "bootstrap-deps": "npm run build -w markdown-deck",
+    "dev": "npm run build -- --watch ### NOTE: Use `node dist` to test run cli",
+    "prebuild": "npm run bootstrap-deps && rm -rf dist && mkdir dist && cp src/editing.js dist",
     "build": "esbuild --bundle src/index.ts --outdir=dist --platform=node --minify",
-    "postbuild": "npm run bootstrap && cp src/editing.js dist",
-    "now-build": "npm run bootstrap && npm run build && node dist/index.js build deck.md -t 'The eloquent cli'",
+    "now-build": "npm run bootstrap-deps && npm run build && node dist/index.js build deck.md -t 'The eloquent cli'",
     "prepack": "npm run build"
   },
   "workspaces": [
