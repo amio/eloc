@@ -47,6 +47,7 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
 
     console.info(`\n  Presenting at ${bold(url)}\n`)
 
+    verboseLog(`SHORTCUTS`)
     verboseLog(dim(' *'), `[${cyan('ESC')}] to toggle editor`)
     verboseLog(dim(' *'), `[${cyan('CMD+S')}/${cyan('CTRL+S')}] to save to ${underline(markdownFile)}\n`)
 

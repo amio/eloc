@@ -8,15 +8,15 @@ Eloquence cli. For presenters who (1) focus on writing, (2) present in a concise
 
 - Serve markdown as presentation
 - Live editor
-- Static export
+- Export to html
 - Print view / Mobile view / Dark mode
 - Customizable with web standard
 
-All of this in a [1MB][packagephobia-href] cli. Check out https://eloc.now.sh
+All of this in a [1MB][packagephobia-href] cli. Check out https://eloc.vercel.app
 
 ### Presentation in Markdown ABC
 
-Break markdown into slides with `---` (horizontal rule), and that's all. e.g. `slides.md`:
+Break markdown into slides with `---` (horizontal rule) like this in `slides.md`:
 
 ```
 # Hello World
@@ -26,9 +26,9 @@ Brown fox jumps over the lazy dog.
 ## Thanks
 ```
 
-then `eloc slides.md` gives you:
+then `eloc slides.md` gives you the presentation with live editor:
 
-<p align="center"><img src="https://eloc-screenshot.now.sh" height="420px" /></p>
+<p align="center"><img src="https://eloc-screenshot.now.sh" width="100%" /></p>
 
 ## Install
 
