@@ -26,7 +26,26 @@ interface ServeOptions {
 
 const { PORT = '5000' } = process.env
 
-export default function elocServe (markdownFile: string, options: ServeOptions) {
+async function tryBindPort(server: http.Server, initialPort: number, maxAttempts = 100): Promise<number> {
+  for (let port = initialPort; port < initialPort + maxAttempts; port++) {
+    try {
+      await new Promise((resolve, reject) => {
+        server.once('error', reject)
+        server.listen(port, () => {
+          server.removeListener('error', reject)
+          resolve(port)
+        })
+      })
+      return port
+    } catch (err: any) {
+      if (err.code !== 'EADDRINUSE') throw err
+      server.removeAllListeners()
+    }
+  }
+  throw new Error(`Unable to find an available port after ${maxAttempts} attempts`)
+}
+
+export default async function elocServe (markdownFile: string, options: ServeOptions) {
   const { title, css, dark, 'progress-bar': progressBar } = options
 
   const verboseLog = (...msg: Array<any>) => {
@@ -40,9 +59,10 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
   )
 
   const server = http.createServer(handler)
-  const port = options.port || parseInt(PORT, 10)
+  const initialPort = options.port || parseInt(PORT, 10)
 
-  server.listen(port).on('listening', () => {
+  try {
+    const port = await tryBindPort(server, initialPort)
     const url = `http://localhost:${port}`
 
     console.info(`\n  Presenting at ${bold(url)}\n`)
@@ -52,9 +72,10 @@ export default function elocServe (markdownFile: string, options: ServeOptions) 
     verboseLog(dim(' *'), `[${cyan('CMD+S')}/${cyan('CTRL+S')}] to save to ${underline(markdownFile)}\n`)
 
     options.open && open(url)
-  }).on('error', (error: NodeJS.ErrnoException) => {
+  } catch (error: any) {
     console.error(error.message)
-  })
+    process.exit(1)
+  }
 }
 
 function sendIndex (opts: IndexHTMLOptions) {
