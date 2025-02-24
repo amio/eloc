@@ -1,4 +1,4 @@
-import { html, css, unsafeCSS } from 'lit'
+import { html, css, unsafeCSS, ReactiveController, ReactiveControllerHost } from 'lit'
 import { LitElement, CSSResultGroup, TemplateResult, PropertyValues } from 'lit'
 import {property, customElement} from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
@@ -8,6 +8,25 @@ import { splitMarkdownToPages, getRangeByIndex } from './utils'
 import interItalicFontCSS from './fonts/inter.italic.css'
 
 import './markdown-slide'
+
+
+class ResizeController implements ReactiveController {
+  host: ReactiveControllerHost;
+  constructor(host: ReactiveControllerHost) {
+    this.host = host;
+    this.host.addController(this);
+  }
+  hostConnected() {
+    window.addEventListener('resize', this.onResize);
+  }
+  hostDisconnected() {
+    window.removeEventListener('resize', this.onResize);
+  }
+  onResize = () => {
+    this.host.requestUpdate();
+  }
+}
+
 
 @customElement('markdown-deck')
 export class MarkdownDeck extends LitElement {
@@ -33,6 +52,11 @@ export class MarkdownDeck extends LitElement {
 
   // private properties
   _touchStart: { clientX: number, clientY: number } // handle for remove swipe listener
+
+  constructor() {
+    super();
+    new ResizeController(this);
+  }
 
   static get styles () {
     return deckStyle()
@@ -128,8 +152,6 @@ export class MarkdownDeck extends LitElement {
     injectFontCSS('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,700;1,300&display=swap')
     injectFontCSS('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap')
 
-    window.addEventListener('resize', this._handleResize)
-
     if (this.hotkey) {
       window.addEventListener('keydown', this._handleKeydown)
     }
@@ -142,7 +164,6 @@ export class MarkdownDeck extends LitElement {
   disconnectedCallback () {
     super.disconnectedCallback()
     window.removeEventListener('keydown', this._handleKeydown)
-    window.removeEventListener('resize', this._handleResize)
   }
 
   shouldUpdate (changedProps: PropertyValues) {
@@ -252,10 +273,6 @@ export class MarkdownDeck extends LitElement {
         this._switchSlide('next')
       }
     }
-  }
-
-  _handleResize = () => {
-    this.requestUpdate()
   }
 
   _loadCSSFile (src: string) {
