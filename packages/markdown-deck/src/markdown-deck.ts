@@ -55,7 +55,7 @@ export class MarkdownDeck extends LitElement {
         section { transform: scale(${this._scale}) }
         ${ unsafeCSS(this._readCustomStyles()) }
       </style>
-      <div id="deck" tabindex="1000"
+      <div id="deck" tabindex="1000" role="main"
         class="${classMap(deckClassNames)}"
         @touchstart=${this._handleTouchStart}
         @touchend=${this._handleTouchEnd} >
