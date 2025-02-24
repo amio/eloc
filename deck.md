@@ -37,13 +37,10 @@ for presenters who
 `npm install eloc`
 
 ```bash
-# Serve "deck.md" as presentation
+# Serve "deck.md" as a presentation (create if not exists)
 $ eloc deck.md
 
-# Create & serve "new-deck.md" as presentation
-$ eloc new-deck.md
-
-# Export presentation to html with images
+# Export presentation to html with assets
 $ eloc build deck.md --include "*.jpg"
 ```
 

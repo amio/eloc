@@ -1,4 +1,5 @@
-import { marked } from 'marked'
+import { Marked } from 'marked'
+import { markedHighlight } from 'marked-highlight'
 import { html, css, LitElement, CSSResultGroup } from 'lit'
 import { property, customElement } from 'lit/decorators.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
@@ -14,6 +15,21 @@ import 'prismjs/components/prism-csharp'
 
 import themeCodeDefault from './theme-code-default'
 import themeDefault from './theme-default'
+
+const marked = new Marked(
+  { gfm: true, breaks: true, async: false },
+  markedHighlight({
+    langPrefix: 'language-',
+    highlight: (code: string, lang: string) => {
+      try {
+        return Prism.highlight(code, Prism.languages[lang || 'markup'])
+      } catch (e) {
+        console.warn(`[highlight error] lang:${lang} code:${code}`)
+        return code
+      }
+    }
+  }),
+)
 
 const orientPortrait = window.innerHeight > window.innerWidth
 const ORIGINAL_WIDTH = orientPortrait ? 800 : 1280
@@ -32,16 +48,7 @@ export class MarkdownSlide extends LitElement {
   }
 
   render () {
-    const markup = marked(this.markdown, {
-      highlight: function (code: string, lang: string) {
-        try {
-          return Prism.highlight(code, Prism.languages[lang || 'markup'])
-        } catch (e) {
-          console.warn(`[highlight error] lang:${lang} index:${this.index}`)
-          return code
-        }
-      }
-    })
+    const markup = marked.parse(this.markdown) as string
 
     const classNames = {
       slide: true,
