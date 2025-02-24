@@ -9,7 +9,7 @@ import interItalicFontCSS from './fonts/inter.italic.css'
 
 import './markdown-slide'
 
-
+// Rerender on resize
 class ResizeController implements ReactiveController {
   host: ReactiveControllerHost;
   constructor(host: ReactiveControllerHost) {
@@ -27,6 +27,54 @@ class ResizeController implements ReactiveController {
   }
 }
 
+// Switch slide by touch event
+class TouchController implements ReactiveController {
+  host: MarkdownDeck;
+  _touchStart?: { clientX: number, clientY: number };
+
+  constructor(host: MarkdownDeck) {
+    this.host = host;
+    this.host.addController(this);
+  }
+
+  hostConnected() {
+    // 使用 host.renderRoot 若可用，否则使用 host
+    const target = ((this.host as any).renderRoot) || this.host;
+    target.addEventListener('touchstart', this.onTouchStart);
+    target.addEventListener('touchend', this.onTouchEnd);
+  }
+
+  hostDisconnected() {
+    const target = ((this.host as any).renderRoot) || this.host;
+    target.removeEventListener('touchstart', this.onTouchStart);
+    target.removeEventListener('touchend', this.onTouchEnd);
+  }
+
+  onTouchStart = (ev: TouchEvent) => {
+    const { clientX, clientY } = ev.changedTouches[0]
+    this._touchStart = { clientX, clientY }
+  }
+
+  onTouchEnd = (ev: TouchEvent) => {
+    if (!this._touchStart) return
+
+    const { clientX, clientY } = ev.changedTouches[0]
+    const deltaX = clientX - this._touchStart.clientX
+    const deltaY = clientY - this._touchStart.clientY
+
+    if (deltaX === 0 && deltaY === 0) {
+      this.host._switchSlide('next')
+    } else if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 0) {
+        this.host._switchSlide('prev')
+      } else {
+        this.host._switchSlide('next')
+      }
+    }
+
+    this._touchStart = undefined
+  }
+}
 
 @customElement('markdown-deck')
 export class MarkdownDeck extends LitElement {
@@ -51,11 +99,12 @@ export class MarkdownDeck extends LitElement {
   @property({ type: String }) _stylesheet = ''      // custom stylesheet
 
   // private properties
-  _touchStart: { clientX: number, clientY: number } // handle for remove swipe listener
+  _touchStart: { clientX: number, clientY: number } // 已移至 TouchController
 
   constructor() {
     super();
     new ResizeController(this);
+    new TouchController(this);
   }
 
   static get styles () {
@@ -81,8 +130,7 @@ export class MarkdownDeck extends LitElement {
       </style>
       <div id="deck" tabindex="1000" role="main"
         class="${classMap(deckClassNames)}"
-        @touchstart=${this._handleTouchStart}
-        @touchend=${this._handleTouchEnd} >
+        @keydown=${this._handleKeydown}>
         <div class="editor-column">
           ${ this.editing ? this._renderEditor() : null }
         </div>
@@ -254,25 +302,6 @@ export class MarkdownDeck extends LitElement {
     const pageIndex = splitMarkdownToPages(textBeforeCaret).length - 1
     this.markdown = editor.value
     this.index = pageIndex
-  }
-
-  _handleTouchStart = (ev: TouchEvent) => {
-    const { clientX, clientY } = ev.changedTouches[0]
-    this._touchStart = { clientX, clientY }
-  }
-
-  _handleTouchEnd = (ev: TouchEvent) => {
-    const { clientX, clientY } = ev.changedTouches[0]
-    const deltaX = clientX - this._touchStart.clientX
-    const deltaY = clientY - this._touchStart.clientY
-
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 0) {
-        this._switchSlide('prev')
-      } else {
-        this._switchSlide('next')
-      }
-    }
   }
 
   _loadCSSFile (src: string) {
