@@ -61,6 +61,10 @@ function scrollTextareaTo(textarea: HTMLTextAreaElement, start: number) {
   textarea.scrollTop = expandScrollHeight - originalScrollHeight - 46
 }
 
+function isGlobalKeyTarget(target: EventTarget | null): boolean {
+  return !target || target === window || target === document || target === document.body || target === document.documentElement
+}
+
 let fontInjected = false
 
 export const MarkdownDeck: React.FC<MarkdownDeckProps> = ({
@@ -209,8 +213,7 @@ export const MarkdownDeck: React.FC<MarkdownDeckProps> = ({
 
     const handleKeydown = (ev: KeyboardEvent) => {
       const target = ev.target as EventTarget | null
-      const isGlobal = !target || target === window || target === document || target === document.body || target === document.documentElement
-      if (!isGlobal && !(target as HTMLElement)?.closest?.('.markdown-deck-root')) return
+      if (!isGlobalKeyTarget(target) && !(target as HTMLElement)?.closest?.('.markdown-deck-root')) return
       if (ev.metaKey || ev.ctrlKey) return
 
       switch (ev.code) {

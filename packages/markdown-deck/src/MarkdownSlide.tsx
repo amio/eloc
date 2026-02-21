@@ -79,9 +79,13 @@ export const MarkdownSlide: React.FC<MarkdownSlideProps> = ({
     return marked.parse(markdown) as string
   }, [markdown])
 
-  const orientPortrait = typeof window !== 'undefined' && window.innerHeight > window.innerWidth
-  const contentWidth = orientPortrait ? ORIGINAL_HEIGHT : ORIGINAL_WIDTH
-  const contentHeight = orientPortrait ? ORIGINAL_WIDTH : ORIGINAL_HEIGHT
+  const { contentWidth, contentHeight } = useMemo(() => {
+    const orientPortrait = typeof window !== 'undefined' && window.innerHeight > window.innerWidth
+    return {
+      contentWidth: orientPortrait ? ORIGINAL_HEIGHT : ORIGINAL_WIDTH,
+      contentHeight: orientPortrait ? ORIGINAL_WIDTH : ORIGINAL_HEIGHT,
+    }
+  }, [scale])
 
   const classNames = ['slide', invert ? 'invert' : ''].filter(Boolean).join(' ')
 
