@@ -3,15 +3,20 @@
     "target": "es2017",
     "module": "esnext",
     "lib": ["esnext", "dom"],
+    "jsx": "react-jsx",
 
     "outDir": "dist",
     "composite": true,
 
-    "sourceMap":true,
-    "allowJs":true,
+    "strict": true,
+    "sourceMap": true,
+    "allowJs": true,
 
-    "moduleResolution":"node",
+    "moduleResolution": "node",
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true
-  }
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }

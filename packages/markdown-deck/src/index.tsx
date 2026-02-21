@@ -1,0 +1,5 @@
+export { MarkdownDeck } from './MarkdownDeck'
+export type { MarkdownDeckProps } from './MarkdownDeck'
+export { MarkdownSlide } from './MarkdownSlide'
+export type { MarkdownSlideProps } from './MarkdownSlide'
+export { splitMarkdownToPages, getRangeByIndex } from './utils'

@@ -6,12 +6,30 @@ const { version } = require('../package.json')
 declare global {
   interface Window {
     markdownSrc: string | null;
+    markdownDeckConfig?: {
+      src?: string;
+      css?: string;
+      hotkey?: boolean;
+      hashsync?: boolean;
+      progressBar?: boolean;
+      invert?: boolean;
+      editing?: boolean;
+    };
   }
 }
 
 export const markdownDeckSource = fs.readFileSync(join(
-  __dirname, '../packages/markdown-deck/dist/markdown-deck.min.js',
+  __dirname, '../packages/markdown-deck/dist/markdown-deck.mount.min.js',
 ), 'utf8')
+
+export const markdownDeckCSS = (() => {
+  const cssPath = join(__dirname, '../packages/markdown-deck/dist/markdown-deck.css')
+  try {
+    return fs.readFileSync(cssPath, 'utf8')
+  } catch {
+    return ''
+  }
+})()
 
 export const editingJsSource = fs.readFileSync(join(__dirname, 'editing.js'))
 
@@ -25,10 +43,6 @@ export interface IndexHTMLOptions {
 }
 
 export function createIndexHTML ({ filename, title, edit, css, dark, progressBar }: IndexHTMLOptions) {
-  const cssAttr = css ? `css="${css}"` : ''
-  const progressBarAttr = progressBar ? 'progressBar' : ''
-  const invertAttr = dark ? 'invert' : ''
-
   const scriptContent = [
     markdownDeckSource,
     edit && editingJsSource,
@@ -43,6 +57,7 @@ export function createIndexHTML ({ filename, title, edit, css, dark, progressBar
       <title>${title || filename}</title>
       <style>
         html, body { height: 100%; margin: 0 }
+        #markdown-deck { height: 100% }
 
         .toast { background-color: #444; color: #fff; text-align: left; white-space: nowrap }
         .toast { font: 16px/30px sans-serif; min-width: 300px; padding: 5px 1em; border-radius: 6px }
@@ -56,17 +71,29 @@ export function createIndexHTML ({ filename, title, edit, css, dark, progressBar
           90% { bottom: 10px; opacity: 1 }
           to { bottom: -10px; opacity: 0 }
         }
+
+        ${markdownDeckCSS}
       </style>
     </head>
     <body>
-      <markdown-deck ${cssAttr} ${progressBarAttr} ${invertAttr} hotkey hashsync></markdown-deck>
+      <div id="markdown-deck"
+        data-hotkey
+        data-hashsync
+        ${css ? `data-css="${css}"` : ''}
+        ${progressBar ? 'data-progressbar' : ''}
+        ${dark ? 'data-invert' : ''}
+      ></div>
       <script>
         console.info('Built with eloc-cli (v${version})')
-        const deck = document.querySelector('markdown-deck')
-        deck.src = new URL(document.location).searchParams.get('src') || "${filename}"
+        window.markdownDeckConfig = {
+          src: new URL(document.location).searchParams.get('src') || "${filename}",
+          hotkey: true,
+          hashsync: true,
+          ${css ? `css: "${css}",` : ''}
+          ${progressBar ? 'progressBar: true,' : ''}
+          ${dark ? 'invert: true,' : ''}
+        }
       </script>
-      <script>window.module = {}</script>
-      <script>window.__dirname = ''</script>
       <script>${scriptContent}</script>
     </body>
   </html>`

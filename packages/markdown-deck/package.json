@@ -1,17 +1,18 @@
 {
   "name": "markdown-deck",
-  "version": "1.7.4",
-  "description": "A web component for presenters",
+  "version": "2.0.0",
+  "description": "A React component for presenters",
   "repository": "amio/markdown-deck",
   "main": "dist/markdown-deck.min.js",
-  "unpkg": "dist/markdown-deck.min.js",
+  "unpkg": "dist/markdown-deck.mount.min.js",
   "license": "MIT",
   "scripts": {
-    "test": "jest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prestart": "rm -rf dist",
-    "preview": "serve .",
-    "start": "npm run build -- --watch",
-    "build": "esbuild src/index.ts --outfile=dist/markdown-deck.min.js --bundle --minify --sourcemap --format=iife",
+    "preview": "vite preview",
+    "start": "vite build --watch",
+    "build": "vite build",
     "build-deck": "rm -rf public && mkdir public && cp -R dist public && cp *.html deck.* public",
     "now-build": "npm run build && npm run build-deck",
     "prepack": "npm run build"
@@ -19,15 +20,20 @@
   "dependencies": {
     "marked": "^15.0.7",
     "marked-highlight": "^2.2.1",
-    "prismjs": "^1.22.0"
+    "prismjs": "^1.22.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "esbuild": "^0.25.0",
-    "jest": "^30.0.3",
-    "lit": "^3.0.2",
-    "serve": "^14.1.2",
-    "ts-jest": "^29.0.5",
-    "typescript": "^5.1.6"
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/prismjs": "^1.26.5",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.1.6",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.1"
   }
 }
