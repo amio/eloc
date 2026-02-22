@@ -46,12 +46,13 @@ export class MarkdownDeck extends LitElement {
   @property({ type: Boolean }) invert = false       // invert color
 
   // watched private properties
-  @property({ type: Number }) _scale = 1            // scale canvas to fit container
   @property({ type: Array }) _pages = []            // split markdown to pages
   @property({ type: String }) _stylesheet = ''      // custom stylesheet
 
   // private properties
   _touchStart: { clientX: number, clientY: number } // handle for remove swipe listener
+  _markdownAbortController: AbortController
+  _cssAbortController: AbortController
 
   constructor() {
     super();
@@ -76,7 +77,6 @@ export class MarkdownDeck extends LitElement {
 
     return html`
       <style>
-        section { transform: scale(${this._scale}) }
         ${ unsafeCSS(this._readCustomStyles()) }
       </style>
       <div id="deck" tabindex="1000" role="main"
@@ -131,7 +131,6 @@ export class MarkdownDeck extends LitElement {
     return html`
       <markdown-slide
         markdown=${md}
-        scale=${this._scale}
         css=${this._stylesheet}
         ?invert=${this.invert}
       >
@@ -158,12 +157,17 @@ export class MarkdownDeck extends LitElement {
 
     if (this.hashsync) {
       this.index = parseInt(location.hash.replace('#', ''), 10) || 0
+      window.addEventListener('hashchange', this._handleHashChange)
     }
   }
 
   disconnectedCallback () {
     super.disconnectedCallback()
     window.removeEventListener('keydown', this._handleKeydown)
+    window.removeEventListener('hashchange', this._handleHashChange)
+
+    this._markdownAbortController?.abort()
+    this._cssAbortController?.abort()
   }
 
   shouldUpdate (changedProps: PropertyValues) {
@@ -189,6 +193,13 @@ export class MarkdownDeck extends LitElement {
   }
 
   updated (changedProps: PropertyValues) {
+    if (changedProps.has('hotkey')) {
+      window.removeEventListener('keydown', this._handleKeydown)
+      if (this.hotkey) {
+        window.addEventListener('keydown', this._handleKeydown)
+      }
+    }
+
     if (changedProps.has('editing')) {
       // event: editor-toggle
       this._dispatchEvent('editor-toggle', {
@@ -276,7 +287,10 @@ export class MarkdownDeck extends LitElement {
   }
 
   _loadCSSFile (src: string) {
-    fetch(src, { mode: 'cors' })
+    this._cssAbortController?.abort()
+    this._cssAbortController = new AbortController()
+
+    fetch(src, { mode: 'cors', signal: this._cssAbortController.signal })
       .then(resp => {
         if (resp.status === 200) return resp.text()
         throw new Error(`(fetching ${src}) ${resp.status}`)
@@ -284,19 +298,28 @@ export class MarkdownDeck extends LitElement {
       .then(text => {
         this._stylesheet = text
       })
+      .catch(err => {
+        if (err.name !== 'AbortError') throw err
+      })
   }
 
   _loadMarkdownFile (src: string) {
-    fetch(src, { mode: 'cors' })
+    this._markdownAbortController?.abort()
+    this._markdownAbortController = new AbortController()
+
+    fetch(src, { mode: 'cors', signal: this._markdownAbortController.signal })
       .then(resp => {
         if (resp.status === 200) return resp.text()
         console.error(`(fetching ${src}) ${resp.status}`)
       })
       .then(text => {
-        this.markdown = text
-        this._updatePages()
+        if (text !== undefined) {
+          this.markdown = text
+        }
       })
-      .catch(console.error)
+      .catch(err => {
+        if (err.name !== 'AbortError') console.error(err)
+      })
   }
 
   _handleKeydown = (ev: KeyboardEvent) => {
@@ -336,6 +359,10 @@ export class MarkdownDeck extends LitElement {
         this.printing = !this.printing
         return this.requestUpdate()
     }
+  }
+
+  _handleHashChange = () => {
+    this.index = parseInt(location.hash.replace('#', ''), 10) || 0
   }
 
   _switchSlide = (to: 'next' | 'prev' | 'first' | 'last' | number) => {
@@ -388,6 +415,8 @@ declare global {
 
 function injectFontCSS (url: string) {
   if (!window.mddSkipLoadingFont) {
+    if (window.document.head.querySelector(`link[href="${url}"]`)) return
+
     const link = window.document.createElement('link')
     link.href = url
     link.rel = 'stylesheet'
@@ -398,6 +427,8 @@ function injectFontCSS (url: string) {
 }
 
 function injectWebFont (css: string) {
+  if ([...window.document.head.querySelectorAll('style')].some(s => s.textContent.includes(css.substring(0, 100)))) return
+
   const style = window.document.createElement('style')
   style.appendChild(window.document.createTextNode(css))
   style.type = 'text/css'

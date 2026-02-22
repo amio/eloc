@@ -28,3 +28,12 @@ test('Get content by page index', () => {
   expect(md.substring(...getRangeByIndex(md, 5))).toBe('')
   expect(md.substring(...getRangeByIndex(md, -5))).toBe('')
 })
+
+test('Split markdown pages with HR at start/end', () => {
+  const mdWithHR = '---\nPage 2\n---'
+  const result = splitMarkdownToPages(mdWithHR)
+  expect(result.length).toBe(3)
+  expect(result[0]).toBe('')
+  expect(result[1]).toBe('Page 2')
+  expect(result[2]).toBe('')
+})

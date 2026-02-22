@@ -37,6 +37,8 @@ const ORIGINAL_HEIGHT = orientPortrait ? 1280 : 800
 
 @customElement('markdown-slide')
 export class MarkdownSlide extends LitElement {
+  _observer: ResizeObserver
+
   @property({ type: String }) markdown: string
   @property({ type: Boolean }) invert: boolean
   @property({ type: String }) css: string
@@ -69,7 +71,12 @@ export class MarkdownSlide extends LitElement {
 
   firstUpdated () {
     const elem = this.shadowRoot.querySelector('.slide')
-    observeResize(elem, this._setScale)
+    this._observer = observeResize(elem, this._setScale)
+  }
+
+  disconnectedCallback () {
+    super.disconnectedCallback()
+    this._observer?.disconnect()
   }
 
   updated () {
@@ -89,9 +96,11 @@ declare global {
   }
 }
 
-function observeResize (elem: Element, cb: Function) {
+function observeResize (elem: Element, cb: ResizeObserverCallback) {
   if (window.ResizeObserver) {
-    new window.ResizeObserver(cb).observe(elem)
+    const observer = new window.ResizeObserver(cb)
+    observer.observe(elem)
+    return observer
   }
 }
 
