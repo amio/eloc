@@ -11,12 +11,14 @@
     "prebuild": "npm run bootstrap-deps && rm -rf dist && mkdir dist && cp src/editing.js dist",
     "build": "esbuild --bundle src/index.ts --outdir=dist --platform=node --minify",
     "now-build": "npm run bootstrap-deps && npm run build && node dist/index.js build deck.md -t 'The eloquent cli'",
+    "test:e2e": "playwright test",
     "prepack": "npm run build"
   },
   "workspaces": [
     "./packages/*"
   ],
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/fs-extra": "^11.0.1",
     "@types/micromatch": "^4.0.1",
     "@types/mri": "^1.1.0",

@@ -200,6 +200,13 @@ export class MarkdownDeck extends LitElement {
       }
     }
 
+    if (changedProps.has('hashsync')) {
+      window.removeEventListener('hashchange', this._handleHashChange)
+      if (this.hashsync) {
+        window.addEventListener('hashchange', this._handleHashChange)
+      }
+    }
+
     if (changedProps.has('editing')) {
       // event: editor-toggle
       this._dispatchEvent('editor-toggle', {
