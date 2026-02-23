@@ -1,4 +1,3 @@
-
 import { marked } from 'marked';
 
 export interface Token {
@@ -54,11 +53,6 @@ export function tokenize(text: string): Token[] {
 declare global {
   interface CSS {
     highlights: Map<string, Highlight>;
-  }
-  class Highlight {
-    constructor(...ranges: AbstractRange[]);
-    priority: number;
-    type: string;
   }
 }
 
