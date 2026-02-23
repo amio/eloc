@@ -7,6 +7,7 @@ export interface Token {
 
 const grammar: Record<string, RegExp> = {
   header: /^#{1,6}\s.*/gm,
+  list: /^\s*([-*+]|\d+\.)\s+.*/gm,
   code: /`[^`]+`/g,
   bold: /\*\*[\s\S]+?\*\*/g,
   italic: /_[\s\S]+?_/g,
@@ -46,6 +47,8 @@ declare global {
 export class MDHighlightEditor extends HTMLElement {
   editor: HTMLDivElement;
 
+  static get observedAttributes() { return ['theme']; }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -59,20 +62,50 @@ export class MDHighlightEditor extends HTMLElement {
 
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(`
-      :host { display: block; border: 1px solid #ccc; padding: 1em; }
+      :host {
+        display: block;
+        border: 1px solid #ccc;
+        padding: 1em;
+        background: var(--md-editor-bg, #ffffff);
+        color: var(--md-editor-fg, #24292f);
+
+        --md-header-color: #0550ae;
+        --md-list-color: #953800;
+        --md-bold-weight: bold;
+        --md-italic-style: italic;
+        --md-code-color: #cf222e;
+        --md-code-bg: #f6f8fa;
+        --md-link-color: #0969da;
+      }
+
+      :host([theme="dark"]) {
+        --md-editor-bg: #0d1117;
+        --md-editor-fg: #c9d1d9;
+        --md-header-color: #79c0ff;
+        --md-list-color: #ffa657;
+        --md-code-color: #ff7b72;
+        --md-code-bg: #161b22;
+        --md-link-color: #58a6ff;
+        border-color: #30363d;
+      }
+
       div { font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace; font-size: 14px; line-height: 1.5; }
-      ::highlight(md-header) { color: #0550ae; font-weight: bold; }
-      ::highlight(md-bold) { font-weight: bold; }
-      ::highlight(md-italic) { font-style: italic; }
-      ::highlight(md-code) { background: #f6f8fa; color: #cf222e; }
-      ::highlight(md-link) { color: #0969da; text-decoration: underline; }
+      ::highlight(md-header) { color: var(--md-header-color); font-weight: bold; }
+      ::highlight(md-list) { color: var(--md-list-color); }
+      ::highlight(md-bold) { font-weight: var(--md-bold-weight); }
+      ::highlight(md-italic) { font-style: var(--md-italic-style); }
+      ::highlight(md-code) { background: var(--md-code-bg); color: var(--md-code-color); }
+      ::highlight(md-link) { color: var(--md-link-color); text-decoration: underline; }
     `);
     // @ts-ignore
     this.shadowRoot!.adoptedStyleSheets = [sheet];
   }
 
   connectedCallback() {
-    this.editor.addEventListener('input', () => this.updateHighlights());
+    this.editor.addEventListener('input', () => {
+      this.editor.normalize();
+      this.updateHighlights();
+    });
 
     // Use initial content as value
     if (this.childNodes.length > 0 && this.editor.innerText === '') {
@@ -81,68 +114,87 @@ export class MDHighlightEditor extends HTMLElement {
     }
   }
 
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    // Re-render if needed, but CSS attribute selectors handle the theme
+  }
+
+  private getDOMState() {
+    const walker = document.createTreeWalker(this.editor, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+    let text = '';
+    const positions: { node: Node; offset: number; textIndex: number }[] = [];
+
+    let node = walker.nextNode();
+    while (node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const content = node.textContent || '';
+        for (let i = 0; i < content.length; i++) {
+          positions.push({ node, offset: i, textIndex: text.length + i });
+        }
+        text += content;
+      } else if (node.nodeName === 'BR') {
+        text += '\n';
+      } else if (node.nodeName === 'DIV' || node.nodeName === 'P') {
+        if (text.length > 0 && !text.endsWith('\n')) {
+          text += '\n';
+        }
+      }
+      node = walker.nextNode();
+    }
+    return { text, positions };
+  }
+
   updateHighlights() {
     if (typeof CSS === 'undefined' || !CSS.highlights) return;
 
-    // Use innerText to get the text content with newlines as the user sees them
-    const text = this.editor.innerText;
+    const { text, positions } = this.getDOMState();
     const tokens = tokenize(text);
 
     const highlightMaps: Record<string, (Range | StaticRange)[]> = {};
 
     for (const token of tokens) {
-      const range = this.createRangeAt(token.start, token.end);
+      const range = this.createRangeFromPositions(token.start, token.end, positions);
       if (range) {
         if (!highlightMaps[token.type]) highlightMaps[token.type] = [];
         highlightMaps[token.type].push(range);
       }
     }
 
-    // Apply highlights with 'md-' prefix
-    const types = ['header', 'bold', 'italic', 'code', 'link'];
+    const types = ['header', 'list', 'bold', 'italic', 'code', 'link'];
     for (const type of types) {
       const ranges = highlightMaps[type] || [];
       CSS.highlights.set(`md-${type}`, new Highlight(...ranges));
     }
   }
 
-  private createRangeAt(start: number, end: number): Range | StaticRange | null {
-    const walker = document.createTreeWalker(this.editor, NodeFilter.SHOW_TEXT);
-    let currentPos = 0;
-    let startNode: Node | null = null;
-    let startOffset = 0;
-    let endNode: Node | null = null;
-    let endOffset = 0;
+  private createRangeFromPositions(start: number, end: number, positions: any[]): Range | StaticRange | null {
+    // Optimized finding: since positions are sorted by textIndex, we can use binary search or just index access if we're careful.
+    // For now, let's just use simple indexing if it's dense.
+    // But it might not be dense due to skipped characters (newlines).
 
-    let node = walker.nextNode();
-    while (node) {
-      const length = node.textContent?.length || 0;
-      if (!startNode && currentPos + length >= start) {
-        startNode = node;
-        startOffset = start - currentPos;
-      }
-      if (!endNode && currentPos + length >= end) {
-        endNode = node;
-        endOffset = end - currentPos;
-        break;
-      }
-      currentPos += length;
-      node = walker.nextNode();
+    // Simple direct access attempt (usually works for first line)
+    let startPos = positions[start];
+    if (!startPos || startPos.textIndex !== start) {
+        startPos = positions.find(p => p.textIndex === start);
     }
 
-    if (startNode && endNode) {
+    let endPos = positions[end - 1];
+    if (!endPos || endPos.textIndex !== end - 1) {
+        endPos = positions.find(p => p.textIndex === end - 1);
+    }
+
+    if (startPos && endPos) {
       // @ts-ignore
       if (typeof StaticRange !== 'undefined') {
         return new StaticRange({
-          startContainer: startNode,
-          startOffset: startOffset,
-          endContainer: endNode,
-          endOffset: endOffset
+          startContainer: startPos.node,
+          startOffset: startPos.offset,
+          endContainer: endPos.node,
+          endOffset: endPos.offset + 1
         });
       } else {
         const range = document.createRange();
-        range.setStart(startNode, startOffset);
-        range.setEnd(endNode, endOffset);
+        range.setStart(startPos.node, startPos.offset);
+        range.setEnd(endPos.node, endPos.offset + 1);
         return range;
       }
     }

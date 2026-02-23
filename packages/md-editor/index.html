@@ -6,17 +6,43 @@
     <title>MD Editor Demo</title>
     <script type="module" src="./dist/index.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        md-editor { height: 300px; }
+        body { font-family: sans-serif; padding: 20px; transition: background 0.3s, color 0.3s; }
+        body.dark { background: #0d1117; color: #c9d1d9; }
+        md-editor { height: 200px; margin-bottom: 20px; }
+        .controls { margin-bottom: 20px; }
     </style>
 </head>
 <body>
     <h1>MD Editor Demo</h1>
-    <md-editor id="editor"># Hello World
+
+    <div class="controls">
+        <button onclick="toggleTheme()">Toggle Dark Theme</button>
+    </div>
+
+    <h3>Default Theme</h3>
+    <md-editor id="editor1"># Light Theme
 
 This is **bold** and this is _italic_.
 `code block`
 [link](https://github.com)
+- List item 1
+- List item 2
 </md-editor>
+
+    <h3>Dark Theme</h3>
+    <md-editor id="editor2" theme="dark"># Dark Theme
+
+This is **bold** and this is _italic_.
+`code block`
+[link](https://github.com)
+- List item 1
+- List item 2
+</md-editor>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+        }
+    </script>
 </body>
 </html>
