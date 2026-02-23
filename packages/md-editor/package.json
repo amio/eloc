@@ -1,0 +1,22 @@
+{
+  "name": "@amio/md-editor",
+  "version": "0.1.0",
+  "description": "A Markdown editor web component with CSS Custom Highlight API",
+  "repository": "amio/eloc",
+  "main": "dist/md-editor.min.js",
+  "unpkg": "dist/md-editor.min.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "start": "npm run build -- --watch",
+    "build": "esbuild src/index.ts --outfile=dist/md-editor.min.js --bundle --minify --sourcemap --format=iife",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "esbuild": "^0.25.0",
+    "jest": "^30.0.3",
+    "ts-jest": "^29.0.5",
+    "typescript": "^5.1.6"
+  }
+}
