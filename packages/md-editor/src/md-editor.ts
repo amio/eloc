@@ -7,6 +7,8 @@
 
 import { tokenize, Token, grammars } from './tokenizer'
 
+const DEBOUNCE_MS = 50
+
 class MDEditor extends HTMLElement {
   private editor: HTMLDivElement
   private debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -118,7 +120,7 @@ class MDEditor extends HTMLElement {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer)
     }
-    this.debounceTimer = setTimeout(() => this.updateHighlights(), 50)
+    this.debounceTimer = setTimeout(() => this.updateHighlights(), DEBOUNCE_MS)
   }
 
   private updateHighlights() {
