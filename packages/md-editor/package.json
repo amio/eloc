@@ -12,5 +12,8 @@
   "devDependencies": {
     "esbuild": "^0.25.0",
     "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "marked": "^15.0.11"
   }
 }

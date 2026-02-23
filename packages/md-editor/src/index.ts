@@ -1,36 +1,46 @@
 
+import { marked } from 'marked';
+
 export interface Token {
   type: string;
   start: number;
   end: number;
 }
 
-const grammar: Record<string, RegExp> = {
-  header: /^#{1,6}\s.*/gm,
-  list: /^\s*([-*+]|\d+\.)\s+.*/gm,
-  code: /`[^`]+`/g,
-  bold: /\*\*[\s\S]+?\*\*/g,
-  italic: /_[\s\S]+?_/g,
-  link: /\[.*?\]\(.*?\)/g,
+const typeMap: Record<string, string> = {
+  'heading': 'header',
+  'strong': 'bold',
+  'em': 'italic',
+  'codespan': 'code',
+  'link': 'link',
+  'list_item': 'list',
+  'list': 'list',
 };
 
 export function tokenize(text: string): Token[] {
-  const tokens: Token[] = [];
+  const tokens = marked.lexer(text);
+  const result: Token[] = [];
 
-  for (const [type, regex] of Object.entries(grammar)) {
-    // Reset regex index for global matches
-    regex.lastIndex = 0;
-    let match;
-    while ((match = regex.exec(text)) !== null) {
-      tokens.push({
-        type,
-        start: match.index,
-        end: match.index + match[0].length,
-      });
+  function walk(tokens: any[], baseOffset: number) {
+    let offset = baseOffset;
+    for (const token of tokens) {
+      const type = typeMap[token.type];
+      if (type) {
+        result.push({
+          type,
+          start: offset,
+          end: offset + token.raw.length,
+        });
+      }
+      if (token.tokens) {
+        walk(token.tokens, offset);
+      }
+      offset += token.raw.length;
     }
   }
 
-  return tokens;
+  walk(tokens, 0);
+  return result;
 }
 
 declare global {
@@ -44,13 +54,17 @@ declare global {
   }
 }
 
+let instanceCounter = 0;
+
 export class MDHighlightEditor extends HTMLElement {
   editor: HTMLDivElement;
+  instanceId: string;
 
   static get observedAttributes() { return ['theme']; }
 
   constructor() {
     super();
+    this.instanceId = `md-editor-${instanceCounter++}`;
     this.attachShadow({ mode: 'open' });
     this.editor = document.createElement('div');
     // @ts-ignore
@@ -90,12 +104,12 @@ export class MDHighlightEditor extends HTMLElement {
       }
 
       div { font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace; font-size: 14px; line-height: 1.5; }
-      ::highlight(md-header) { color: var(--md-header-color); font-weight: bold; }
-      ::highlight(md-list) { color: var(--md-list-color); }
-      ::highlight(md-bold) { font-weight: var(--md-bold-weight); }
-      ::highlight(md-italic) { font-style: var(--md-italic-style); }
-      ::highlight(md-code) { background: var(--md-code-bg); color: var(--md-code-color); }
-      ::highlight(md-link) { color: var(--md-link-color); text-decoration: underline; }
+      ::highlight(${this.instanceId}-header) { color: var(--md-header-color); font-weight: bold; }
+      ::highlight(${this.instanceId}-list) { color: var(--md-list-color); }
+      ::highlight(${this.instanceId}-bold) { font-weight: var(--md-bold-weight); }
+      ::highlight(${this.instanceId}-italic) { font-style: var(--md-italic-style); }
+      ::highlight(${this.instanceId}-code) { background: var(--md-code-bg); color: var(--md-code-color); }
+      ::highlight(${this.instanceId}-link) { color: var(--md-link-color); text-decoration: underline; }
     `);
     // @ts-ignore
     this.shadowRoot!.adoptedStyleSheets = [sheet];
@@ -115,7 +129,6 @@ export class MDHighlightEditor extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    // Re-render if needed, but CSS attribute selectors handle the theme
   }
 
   private getDOMState() {
@@ -162,16 +175,11 @@ export class MDHighlightEditor extends HTMLElement {
     const types = ['header', 'list', 'bold', 'italic', 'code', 'link'];
     for (const type of types) {
       const ranges = highlightMaps[type] || [];
-      CSS.highlights.set(`md-${type}`, new Highlight(...ranges));
+      CSS.highlights.set(`${this.instanceId}-${type}`, new Highlight(...ranges));
     }
   }
 
   private createRangeFromPositions(start: number, end: number, positions: any[]): Range | StaticRange | null {
-    // Optimized finding: since positions are sorted by textIndex, we can use binary search or just index access if we're careful.
-    // For now, let's just use simple indexing if it's dense.
-    // But it might not be dense due to skipped characters (newlines).
-
-    // Simple direct access attempt (usually works for first line)
     let startPos = positions[start];
     if (!startPos || startPos.textIndex !== start) {
         startPos = positions.find(p => p.textIndex === start);
@@ -183,20 +191,11 @@ export class MDHighlightEditor extends HTMLElement {
     }
 
     if (startPos && endPos) {
-      // @ts-ignore
-      if (typeof StaticRange !== 'undefined') {
-        return new StaticRange({
-          startContainer: startPos.node,
-          startOffset: startPos.offset,
-          endContainer: endPos.node,
-          endOffset: endPos.offset + 1
-        });
-      } else {
-        const range = document.createRange();
-        range.setStart(startPos.node, startPos.offset);
-        range.setEnd(endPos.node, endPos.offset + 1);
-        return range;
-      }
+      // Use Range instead of StaticRange for better reliability as suggested
+      const range = document.createRange();
+      range.setStart(startPos.node, startPos.offset);
+      range.setEnd(endPos.node, endPos.offset + 1);
+      return range;
     }
     return null;
   }
