@@ -6,9 +6,6 @@
     <title>MD Editor Demo</title>
     <script type="module" src="./dist/index.js"></script>
     <style>
-        :root {
-            transition: color-scheme 0.3s;
-        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             padding: 40px;
@@ -17,6 +14,8 @@
             line-height: 1.6;
         }
         md-editor {
+            display: block;
+            white-space: pre-wrap;
             height: 400px;
             margin-top: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -120,10 +119,8 @@ Line 30
             // Update editor attribute
             if (mode === 'auto') {
                 editor.removeAttribute('theme');
-                root.style.colorScheme = 'light dark';
             } else {
                 editor.setAttribute('theme', mode);
-                root.style.colorScheme = mode;
             }
         }
     </script>

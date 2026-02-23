@@ -51,15 +51,9 @@ export function tokenize(text: string): Token[] {
   return result;
 }
 
+// CSS Custom Highlight API types are partially missing in some TS versions
 declare global {
-  interface CSS {
-    highlights: Map<string, Highlight>;
-  }
-  class Highlight {
-    constructor(...ranges: AbstractRange[]);
-    priority: number;
-    type: string;
-  }
+  interface HighlightRegistry extends Map<string, Highlight> {}
 }
 
 let instanceCounter = 0;
@@ -87,8 +81,6 @@ export class MDHighlightEditor extends HTMLElement {
         flex-direction: column;
         border: 1px solid var(--md-border-color, #ccc);
         padding: 1em;
-        background: var(--md-editor-bg, #ffffff);
-        color: var(--md-editor-fg, #24292f);
         box-sizing: border-box;
         overflow: hidden;
 
@@ -107,7 +99,7 @@ export class MDHighlightEditor extends HTMLElement {
       }
 
       @media (prefers-color-scheme: dark) {
-        :host {
+        :host(:not([theme])) {
           --md-editor-bg: #0d1117;
           --md-editor-fg: #c9d1d9;
           --md-header-color: #79c0ff;
@@ -151,6 +143,8 @@ export class MDHighlightEditor extends HTMLElement {
 
       div {
         flex: 1;
+        background: var(--md-editor-bg);
+        color: var(--md-editor-fg);
         overflow-y: auto;
         font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
         font-size: 14px;
@@ -179,8 +173,11 @@ export class MDHighlightEditor extends HTMLElement {
     });
 
     // Use initial content as value
-    if (this.childNodes.length > 0 && this.editor.innerText === '') {
-      this.editor.innerText = this.textContent || '';
+    if (this.editor.innerText === '') {
+      // For custom elements, textContent might be collapsed if not display: block/pre
+      // We try to get the rawest possible text.
+      const rawText = this.getAttribute('value') || this.textContent || '';
+      this.editor.innerText = rawText.trim();
       this.updateHighlights();
     }
   }
