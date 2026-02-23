@@ -6,50 +6,92 @@
     <title>MD Editor Demo</title>
     <script type="module" src="./dist/index.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; transition: background 0.3s, color 0.3s; }
-        body.dark { background: #0d1117; color: #c9d1d9; }
-        md-editor { height: 200px; margin-bottom: 20px; }
-        .controls { margin-bottom: 20px; }
-        @media (prefers-color-scheme: dark) {
-            body:not(.light) { background: #0d1117; color: #c9d1d9; }
+        :root {
+            transition: color-scheme 0.3s;
         }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        md-editor {
+            height: 400px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: Canvas;
+            color: CanvasText;
+            border-radius: 4px;
+        }
+        button.active {
+            background: #0969da;
+            color: white;
+            border-color: #0969da;
+        }
+        h1 { margin-bottom: 30px; }
     </style>
 </head>
 <body>
     <h1>MD Editor Demo</h1>
 
     <div class="controls">
-        <button onclick="toggleTheme()">Toggle Dark Class on Body</button>
+        <span>Theme:</span>
+        <button id="btn-auto" class="active" onclick="setTheme('auto')">Auto</button>
+        <button id="btn-light" onclick="setTheme('light')">Light</button>
+        <button id="btn-dark" onclick="setTheme('dark')">Dark</button>
     </div>
 
-    <h3>Auto Theme (Adapts to system)</h3>
-    <md-editor id="editor-auto"># Auto Theme Header
+    <md-editor id="editor"># Markdown Editor
 
-This is **bold text** and this is _italic text_.
+This is a **bold** and _italic_ text example.
+
+- List item 1
+- List item 2
 
 ```javascript
-// Code block
-console.log("Hello World");
+function hello() {
+  console.log("Hello, CSS Custom Highlight API!");
+}
 ```
 
-- List item
-</md-editor>
-
-    <h3>Explicit Dark Theme</h3>
-    <md-editor id="editor-dark" theme="dark"># Explicit Dark
-
-Support for `inline code` and [links](https://github.com).
-</md-editor>
-
-    <h3>Explicit Light Theme</h3>
-    <md-editor id="editor-light" theme="light"># Explicit Light
-
-Test.
+[Visit GitHub](https://github.com)
 </md-editor>
 
     <script>
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
+        const editor = document.getElementById('editor');
+        const root = document.documentElement;
+        const buttons = {
+            auto: document.getElementById('btn-auto'),
+            light: document.getElementById('btn-light'),
+            dark: document.getElementById('btn-dark')
+        };
+
+        function setTheme(mode) {
+            // Update buttons
+            Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+            buttons[mode].classList.add('active');
+
+            // Update editor attribute
+            if (mode === 'auto') {
+                editor.removeAttribute('theme');
+                root.style.colorScheme = 'light dark';
+            } else {
+                editor.setAttribute('theme', mode);
+                root.style.colorScheme = mode;
+            }
         }
     </script>
 </body>
