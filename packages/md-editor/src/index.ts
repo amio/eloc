@@ -1,3 +1,4 @@
+
 import { marked } from 'marked';
 
 export interface Token {
@@ -54,6 +55,11 @@ declare global {
   interface CSS {
     highlights: Map<string, Highlight>;
   }
+  class Highlight {
+    constructor(...ranges: AbstractRange[]);
+    priority: number;
+    type: string;
+  }
 }
 
 let instanceCounter = 0;
@@ -72,19 +78,19 @@ export class MDHighlightEditor extends HTMLElement {
     this.editor = document.createElement('div');
     // @ts-ignore
     this.editor.contentEditable = 'plaintext-only';
-    this.editor.style.whiteSpace = 'pre-wrap';
-    this.editor.style.outline = 'none';
-    this.editor.style.minHeight = '1em';
     this.shadowRoot!.append(this.editor);
 
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(`
       :host {
-        display: block;
+        display: flex;
+        flex-direction: column;
         border: 1px solid var(--md-border-color, #ccc);
         padding: 1em;
         background: var(--md-editor-bg, #ffffff);
         color: var(--md-editor-fg, #24292f);
+        box-sizing: border-box;
+        overflow: hidden;
 
         --md-editor-bg: #ffffff;
         --md-editor-fg: #24292f;
@@ -143,7 +149,16 @@ export class MDHighlightEditor extends HTMLElement {
         --md-border-color: #ccc;
       }
 
-      div { font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace; font-size: 14px; line-height: 1.5; }
+      div {
+        flex: 1;
+        overflow-y: auto;
+        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        outline: none;
+        white-space: pre-wrap;
+        min-height: 1em;
+      }
 
       ::highlight(${this.instanceId}-header) { color: var(--md-header-color); font-weight: bold; }
       ::highlight(${this.instanceId}-list) { color: var(--md-list-color); }
