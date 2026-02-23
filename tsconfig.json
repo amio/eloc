@@ -24,6 +24,7 @@
   "include": ["src"],
   "exclude": ["dist"],
   "references": [
-    { "path": "./packages/markdown-deck" }
+    { "path": "./packages/markdown-deck" },
+    { "path": "./packages/md-editor" }
   ]
 }
