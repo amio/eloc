@@ -10,33 +10,41 @@
         body.dark { background: #0d1117; color: #c9d1d9; }
         md-editor { height: 200px; margin-bottom: 20px; }
         .controls { margin-bottom: 20px; }
+        @media (prefers-color-scheme: dark) {
+            body:not(.light) { background: #0d1117; color: #c9d1d9; }
+        }
     </style>
 </head>
 <body>
     <h1>MD Editor Demo</h1>
 
     <div class="controls">
-        <button onclick="toggleTheme()">Toggle Dark Theme</button>
+        <button onclick="toggleTheme()">Toggle Dark Class on Body</button>
     </div>
 
-    <h3>Default Theme</h3>
-    <md-editor id="editor1"># Light Theme
+    <h3>Auto Theme (Adapts to system)</h3>
+    <md-editor id="editor-auto"># Auto Theme Header
 
-This is **bold** and this is _italic_.
-`code block`
-[link](https://github.com)
-- List item 1
-- List item 2
+This is **bold text** and this is _italic text_.
+
+```javascript
+// Code block
+console.log("Hello World");
+```
+
+- List item
 </md-editor>
 
-    <h3>Dark Theme</h3>
-    <md-editor id="editor2" theme="dark"># Dark Theme
+    <h3>Explicit Dark Theme</h3>
+    <md-editor id="editor-dark" theme="dark"># Explicit Dark
 
-This is **bold** and this is _italic_.
-`code block`
-[link](https://github.com)
-- List item 1
-- List item 2
+Support for `inline code` and [links](https://github.com).
+</md-editor>
+
+    <h3>Explicit Light Theme</h3>
+    <md-editor id="editor-light" theme="light"># Explicit Light
+
+Test.
 </md-editor>
 
     <script>
