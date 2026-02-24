@@ -81,7 +81,7 @@ const lightThemeVars = `
   --md-code-color: #cf222e;
   --md-code-bg: #f6f8fa;
   --md-code-block-color: #6e7781;
-  --md-code-block-bg: #f8f9fa;
+  --md-code-block-bg: transparent;
   --md-link-color: #0969da;
   --md-border-color: #ccc;
 `;
@@ -96,7 +96,7 @@ const darkThemeVars = `
   --md-code-color: #ff7b72;
   --md-code-bg: #161b22;
   --md-code-block-color: #8b949e;
-  --md-code-block-bg: #111418;
+  --md-code-block-bg: transparent;
   --md-link-color: #58a6ff;
   --md-border-color: #30363d;
 `;
@@ -121,12 +121,10 @@ export class MDHighlightEditor extends HTMLElement {
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(`
       :host {
-        display: flex;
-        flex-direction: column;
         border: 1px solid var(--md-border-color, #ccc);
-        padding: 1em;
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: scroll;
+        height: 100%;
         ${lightThemeVars}
       }
 
@@ -145,7 +143,6 @@ export class MDHighlightEditor extends HTMLElement {
       }
 
       div {
-        flex: 1;
         background: var(--md-editor-bg);
         color: var(--md-editor-fg);
         overflow: scroll;
@@ -155,6 +152,9 @@ export class MDHighlightEditor extends HTMLElement {
         outline: none;
         white-space: pre-wrap;
         min-height: 1em;
+        display: border-box;
+        padding: 1em;
+        height: calc(100% - 2em);
       }
 
       ::highlight(${this.instanceId}-header) { color: var(--md-header-color); font-weight: bold; }
