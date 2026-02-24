@@ -2,6 +2,10 @@
   "name": "@amio/md-editor",
   "version": "0.1.0",
   "description": "A minimal Markdown editor web component with syntax highlighting.",
+  "repository": "https://github.com/amio/eloc/tree/main/packages/md-editor",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "module": "dist/index.js",
   "license": "MIT",
