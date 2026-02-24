@@ -10,10 +10,10 @@
     "prepack": "npm run build"
   },
   "devDependencies": {
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.27.3",
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "marked": "^15.0.11"
+    "marked": "^17.0.3"
   }
 }
