@@ -27,10 +27,17 @@ export function tokenize(text: string): Token[] {
     for (const token of tokens) {
       const type = typeMap[token.type];
       if (type) {
+        // Trim trailing newlines for the highlight range,
+        // but keep original length for offset calculation.
+        let raw = token.raw;
+        let endOffset = raw.length;
+        while (endOffset > 0 && (raw[endOffset - 1] === '\n' || raw[endOffset - 1] === '\r')) {
+          endOffset--;
+        }
         result.push({
           type,
           start: currOffset,
-          end: currOffset + token.raw.length,
+          end: currOffset + endOffset,
         });
       }
       if (token.tokens) {
@@ -207,9 +214,11 @@ export class MDHighlightEditor extends HTMLElement {
         }
         text += content;
       } else if (node.nodeName === 'BR') {
+        positions.set(text.length, { node, offset: 0 });
         text += '\n';
       } else if (node.nodeName === 'DIV' || node.nodeName === 'P') {
         if (text.length > 0 && !text.endsWith('\n')) {
+          positions.set(text.length, { node, offset: 0 });
           text += '\n';
         }
       }
