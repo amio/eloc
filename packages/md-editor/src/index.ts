@@ -71,6 +71,36 @@ declare global {
 
 let instanceCounter = 0;
 
+const lightThemeVars = `
+  --md-editor-bg: #ffffff;
+  --md-editor-fg: #24292f;
+  --md-header-color: #0550ae;
+  --md-list-color: #953800;
+  --md-bold-weight: bold;
+  --md-italic-style: italic;
+  --md-code-color: #cf222e;
+  --md-code-bg: #f6f8fa;
+  --md-code-block-color: #6e7781;
+  --md-code-block-bg: #f8f9fa;
+  --md-link-color: #0969da;
+  --md-border-color: #ccc;
+`;
+
+const darkThemeVars = `
+  --md-editor-bg: #0d1117;
+  --md-editor-fg: #c9d1d9;
+  --md-header-color: #79c0ff;
+  --md-list-color: #ffa657;
+  --md-bold-weight: bold;
+  --md-italic-style: italic;
+  --md-code-color: #ff7b72;
+  --md-code-bg: #161b22;
+  --md-code-block-color: #8b949e;
+  --md-code-block-bg: #111418;
+  --md-link-color: #58a6ff;
+  --md-border-color: #30363d;
+`;
+
 export class MDHighlightEditor extends HTMLElement {
   editor: HTMLDivElement;
   instanceId: string;
@@ -97,62 +127,21 @@ export class MDHighlightEditor extends HTMLElement {
         padding: 1em;
         box-sizing: border-box;
         overflow: hidden;
-
-        --md-editor-bg: #ffffff;
-        --md-editor-fg: #24292f;
-        --md-header-color: #0550ae;
-        --md-list-color: #953800;
-        --md-bold-weight: bold;
-        --md-italic-style: italic;
-        --md-code-color: #cf222e;
-        --md-code-bg: #f6f8fa;
-        --md-code-block-color: #6e7781;
-        --md-code-block-bg: #f8f9fa;
-        --md-link-color: #0969da;
-        --md-border-color: #ccc;
+        ${lightThemeVars}
       }
 
       @media (prefers-color-scheme: dark) {
-        :host(:not([theme])) {
-          --md-editor-bg: #0d1117;
-          --md-editor-fg: #c9d1d9;
-          --md-header-color: #79c0ff;
-          --md-list-color: #ffa657;
-          --md-code-color: #ff7b72;
-          --md-code-bg: #161b22;
-          --md-code-block-color: #8b949e;
-          --md-code-block-bg: #111418;
-          --md-link-color: #58a6ff;
-          --md-border-color: #30363d;
+        :host(:not([theme])), :host([theme="auto"]) {
+          ${darkThemeVars}
         }
       }
 
       :host([theme="dark"]) {
-        --md-editor-bg: #0d1117;
-        --md-editor-fg: #c9d1d9;
-        --md-header-color: #79c0ff;
-        --md-list-color: #ffa657;
-        --md-code-color: #ff7b72;
-        --md-code-bg: #161b22;
-        --md-code-block-color: #8b949e;
-        --md-code-block-bg: #111418;
-        --md-link-color: #58a6ff;
-        --md-border-color: #30363d;
+        ${darkThemeVars}
       }
 
       :host([theme="light"]) {
-        --md-editor-bg: #ffffff;
-        --md-editor-fg: #24292f;
-        --md-header-color: #0550ae;
-        --md-list-color: #953800;
-        --md-bold-weight: bold;
-        --md-italic-style: italic;
-        --md-code-color: #cf222e;
-        --md-code-bg: #f6f8fa;
-        --md-code-block-color: #6e7781;
-        --md-code-block-bg: #f8f9fa;
-        --md-link-color: #0969da;
-        --md-border-color: #ccc;
+        ${lightThemeVars}
       }
 
       div {
