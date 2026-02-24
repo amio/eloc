@@ -152,7 +152,7 @@ export class MDHighlightEditor extends HTMLElement {
         outline: none;
         white-space: pre-wrap;
         min-height: 1em;
-        display: border-box;
+        box-sizing: border-box;
         padding: 1em;
         height: calc(100% - 2em);
       }
@@ -175,6 +175,7 @@ export class MDHighlightEditor extends HTMLElement {
     this.editor.addEventListener('input', () => {
       this.editor.normalize();
       this.scheduleUpdate();
+      this.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
     });
 
     // Use initial content as value
@@ -203,6 +204,96 @@ export class MDHighlightEditor extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+  }
+
+  get value(): string {
+    return this.getDOMState().text;
+  }
+
+  set value(val: string) {
+    if (this.value === val) return;
+    this.editor.innerText = val;
+    this.updateHighlights();
+  }
+
+  get selectionStart(): number {
+    const selection = this.shadowRoot!.getSelection();
+    if (!selection || selection.rangeCount === 0) return 0;
+    const range = selection.getRangeAt(0);
+    const node = range.startContainer;
+    const offset = range.startOffset;
+
+    const { nodeEntries } = this.getDOMState();
+    const entry = nodeEntries.find(e => e.node === node);
+    if (entry) {
+      return entry.start + offset;
+    }
+
+    if (node === this.editor) {
+      if (offset < this.editor.childNodes.length) {
+        const child = this.editor.childNodes[offset];
+        const entry = nodeEntries.find(e => e.node === child);
+        if (entry) return entry.start;
+      } else {
+        return this.value.length;
+      }
+    }
+
+    return 0;
+  }
+
+  setSelectionRange(start: number, end: number) {
+    const { nodeEntries } = this.getDOMState();
+    const range = document.createRange();
+
+    const startEntry = this.findEntry(start, nodeEntries);
+    if (startEntry) {
+      if (startEntry.node.nodeType === Node.TEXT_NODE) {
+        range.setStart(startEntry.node, Math.min(start - startEntry.start, startEntry.length));
+      } else {
+        range.setStartBefore(startEntry.node);
+      }
+    } else if (start >= this.value.length && nodeEntries.length > 0) {
+      const lastEntry = nodeEntries[nodeEntries.length - 1];
+      if (lastEntry.node.nodeType === Node.TEXT_NODE) {
+        range.setStart(lastEntry.node, lastEntry.length);
+      } else {
+        range.setStartAfter(lastEntry.node);
+      }
+    }
+
+    const endEntry = this.findEntry(end - 1, nodeEntries);
+    if (endEntry) {
+      if (endEntry.node.nodeType === Node.TEXT_NODE) {
+        range.setEnd(endEntry.node, Math.min((end - 1 - endEntry.start) + 1, endEntry.length));
+      } else {
+        range.setEndAfter(endEntry.node);
+      }
+    } else if (end >= this.value.length && nodeEntries.length > 0) {
+      const lastEntry = nodeEntries[nodeEntries.length - 1];
+      if (lastEntry.node.nodeType === Node.TEXT_NODE) {
+        range.setEnd(lastEntry.node, lastEntry.length);
+      } else {
+        range.setEndAfter(lastEntry.node);
+      }
+    }
+
+    const selection = this.shadowRoot!.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      // Scroll into view
+      const rangeRect = range.getBoundingClientRect();
+      const editorRect = this.editor.getBoundingClientRect();
+      if (rangeRect.top < editorRect.top || rangeRect.bottom > editorRect.bottom) {
+        this.editor.scrollTop += (rangeRect.top - editorRect.top) - (editorRect.height / 2);
+      }
+    }
+  }
+
+  focus() {
+    this.editor.focus();
   }
 
   private getDOMState() {
@@ -269,7 +360,7 @@ export class MDHighlightEditor extends HTMLElement {
   }
 
   private createRange(start: number, end: number, entries: NodeEntry[]): Range | null {
-    if (start >= end) return null;
+    if (start > end) return null;
     const startEntry = this.findEntry(start, entries);
     const endEntry = this.findEntry(end - 1, entries);
 

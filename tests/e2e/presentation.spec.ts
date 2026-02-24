@@ -27,7 +27,7 @@ test.describe('Eloc Presentation', () => {
 
   test('should toggle editor using ESC', async ({ page }) => {
     await page.keyboard.press('Escape');
-    const editor = page.locator('markdown-deck textarea.editor');
+    const editor = page.locator('markdown-deck md-editor.editor');
     await expect(editor).toBeVisible();
 
     await page.keyboard.press('Escape');
@@ -44,8 +44,10 @@ test.describe('Eloc Presentation', () => {
 
   test('should save changes using CTRL+S', async ({ page }) => {
     await page.keyboard.press('Escape'); // Open editor
-    const editor = page.locator('markdown-deck textarea.editor');
-    await editor.fill('# New Content\n---\n# Slide 2');
+    const editor = page.locator('markdown-deck md-editor.editor');
+    await editor.evaluate((el: any) => el.value = '# New Content\n---\n# Slide 2');
+    // Trigger input event after setting value programmatically
+    await editor.evaluate((el: any) => el.dispatchEvent(new Event('input', { bubbles: true, composed: true })));
 
     // Intercept the save request
     const savePromise = page.waitForResponse(response =>

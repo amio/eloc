@@ -17,6 +17,7 @@
     "prepack": "npm run build"
   },
   "dependencies": {
+    "@amio/md-editor": "*",
     "marked": "^17.0.3",
     "marked-highlight": "^2.2.1",
     "prismjs": "^1.22.0"

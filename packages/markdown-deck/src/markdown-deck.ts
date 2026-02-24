@@ -7,6 +7,7 @@ import { repeat } from 'lit/directives/repeat.js'
 import { splitMarkdownToPages, getRangeByIndex } from './utils'
 import interItalicFontCSS from './fonts/inter.italic.css'
 
+import { MDHighlightEditor } from '@amio/md-editor'
 import './markdown-slide'
 
 
@@ -110,12 +111,14 @@ export class MarkdownDeck extends LitElement {
 
   _renderEditor () {
     return html`
-      <textarea class="editor"
+      <md-editor class="editor"
+        .value=${this.markdown}
+        theme=${this.invert ? 'dark' : 'light'}
         @keydown=${this._handleEditing}
         @keyup=${this._handleEditing}
         @input=${this._handleEditing}
         @click=${this._handleEditing}
-      >${this.markdown}</textarea>
+      ></md-editor>
     `
   }
 
@@ -227,13 +230,12 @@ export class MarkdownDeck extends LitElement {
   }
 
   _syncEditorSelection () {
-    const textarea = this.shadowRoot.querySelector('textarea')
+    const editor = this.shadowRoot.querySelector('md-editor') as MDHighlightEditor
     if (this.markdown) {
       const [start, end] = getRangeByIndex(this.markdown, this.index)
-      scrollTextareaTo(textarea, start)
-      textarea.setSelectionRange(start, end)
+      editor.setSelectionRange(start, end)
     }
-    textarea.focus()
+    editor.focus()
   }
 
   _dispatchEvent (name: string, detail: any) {
@@ -267,7 +269,7 @@ export class MarkdownDeck extends LitElement {
     }
 
     // sync deck with editor
-    const editor: HTMLTextAreaElement = this.shadowRoot.querySelector('textarea')
+    const editor = this.shadowRoot.querySelector('md-editor') as MDHighlightEditor
     const textBeforeCaret = editor.value.substr(0, editor.selectionStart + 2)
     const pageIndex = splitMarkdownToPages(textBeforeCaret).length - 1
     this.markdown = editor.value
@@ -466,20 +468,6 @@ function setLocationHash (hash: any) {
   }
 }
 
-function scrollTextareaTo (textarea: HTMLTextAreaElement, start: number) {
-  if (start === 0) return
-
-  const content = textarea.value
-  textarea.value = content.substr(0, start)
-
-  const originalScrollHeight = textarea.scrollHeight
-  textarea.style.paddingBottom = textarea.scrollHeight + 'px'
-  const expandScrollHeight = textarea.scrollHeight
-  textarea.style.paddingBottom = '15px'
-
-  textarea.value = content
-  textarea.scrollTop = expandScrollHeight - originalScrollHeight - 46
-}
 
 function deckStyle (): CSSResultGroup {
   return css`
@@ -506,13 +494,8 @@ function deckStyle (): CSSResultGroup {
     .editor {
       height: 100%;
       width: 100%;
-      padding: 15px 18px;
       border: 0px solid transparent;
       box-sizing: border-box;
-      color: #666;
-      background-color: #F7F7F7;
-      font: 16px/1.6em monospace;
-      resize: none;
     }
     .editor:focus {
       color: #111;
