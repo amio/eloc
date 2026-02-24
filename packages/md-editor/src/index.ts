@@ -203,7 +203,13 @@ export class MDHighlightEditor extends HTMLElement {
     }
   }
 
+  get theme() { return this.getAttribute('theme') || 'auto'; }
+  set theme(val: string) { this.setAttribute('theme', val); }
+
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (name === 'theme' && oldValue !== newValue) {
+      this.updateHighlights();
+    }
   }
 
   get value(): string {

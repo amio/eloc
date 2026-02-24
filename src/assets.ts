@@ -13,6 +13,10 @@ export const markdownDeckSource = fs.readFileSync(join(
   __dirname, '../packages/markdown-deck/dist/markdown-deck.min.js',
 ), 'utf8')
 
+export const mdEditorSource = fs.readFileSync(join(
+  __dirname, '../packages/md-editor/dist/index.js',
+), 'utf8')
+
 export const editingJsSource = fs.readFileSync(join(__dirname, 'editing.js'))
 
 export interface IndexHTMLOptions {
@@ -30,6 +34,7 @@ export function createIndexHTML ({ filename, title, edit, css, dark, progressBar
   const invertAttr = dark ? 'invert' : ''
 
   const scriptContent = [
+    mdEditorSource,
     markdownDeckSource,
     edit && editingJsSource,
   ].join(';')

@@ -10,7 +10,7 @@
   "module": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --minify --format=esm --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --minify --format=iife --outfile=dist/index.js",
     "prepack": "npm run build"
   },
   "devDependencies": {

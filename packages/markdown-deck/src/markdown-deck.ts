@@ -7,7 +7,7 @@ import { repeat } from 'lit/directives/repeat.js'
 import { splitMarkdownToPages, getRangeByIndex } from './utils'
 import interItalicFontCSS from './fonts/inter.italic.css'
 
-import { MDHighlightEditor } from '@amio/md-editor'
+import type { MDHighlightEditor } from '@amio/md-editor'
 import './markdown-slide'
 
 
