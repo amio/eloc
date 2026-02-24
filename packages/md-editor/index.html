@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Editor Demo</title>
+    <script type="module" src="./dist/index.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        md-editor {
+            display: block;
+            white-space: pre-wrap;
+            height: 400px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: Canvas;
+            color: CanvasText;
+            border-radius: 4px;
+        }
+        button.active {
+            background: #0969da;
+            color: white;
+            border-color: #0969da;
+        }
+        h1 { margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <h1>MD Editor Demo</h1>
+
+    <div class="controls">
+        <span>Theme:</span>
+        <button id="btn-auto" class="active" onclick="setTheme('auto')">Auto</button>
+        <button id="btn-light" onclick="setTheme('light')">Light</button>
+        <button id="btn-dark" onclick="setTheme('dark')">Dark</button>
+    </div>
+
+    <md-editor id="editor"># Markdown Editor
+
+This is a **bold** and _italic_ text example.
+
+- List item 1
+- List item 2
+
+```javascript
+function hello() {
+  console.log("Hello, CSS Custom Highlight API!");
+}
+```
+
+[Visit GitHub](https://github.com)
+
+## Scrolling Test
+
+Line 1
+Line 2
+Line 3
+Line 4
+Line 5
+Line 6
+Line 7
+Line 8
+Line 9
+Line 10
+Line 11
+Line 12
+Line 13
+Line 14
+Line 15
+Line 16
+Line 17
+Line 18
+Line 19
+Line 20
+Line 21
+Line 22
+Line 23
+Line 24
+Line 25
+Line 26
+Line 27
+Line 28
+Line 29
+Line 30
+</md-editor>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const root = document.documentElement;
+        const buttons = {
+            auto: document.getElementById('btn-auto'),
+            light: document.getElementById('btn-light'),
+            dark: document.getElementById('btn-dark')
+        };
+
+        function setTheme(mode) {
+            // Update buttons
+            Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+            buttons[mode].classList.add('active');
+
+            // Update editor attribute
+            if (mode === 'auto') {
+                editor.removeAttribute('theme');
+            } else {
+                editor.setAttribute('theme', mode);
+            }
+        }
+    </script>
+</body>
+</html>

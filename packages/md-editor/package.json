@@ -1,0 +1,19 @@
+{
+  "name": "@amio/md-editor",
+  "version": "0.1.0",
+  "description": "A Markdown editor web component using CSS Custom Highlight API",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --minify --format=esm --outfile=dist/index.js",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "marked": "^15.0.11"
+  }
+}
