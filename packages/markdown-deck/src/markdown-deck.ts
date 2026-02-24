@@ -434,7 +434,7 @@ function injectFontCSS (url: string) {
 }
 
 function injectWebFont (css: string) {
-  if ([...window.document.head.querySelectorAll('style')].some(s => s.textContent.includes(css.substring(0, 100)))) return
+  if (Array.from(window.document.head.querySelectorAll('style')).some(s => s.textContent.includes(css.substring(0, 100)))) return
 
   const style = window.document.createElement('style')
   style.appendChild(window.document.createTextNode(css))
