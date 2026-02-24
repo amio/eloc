@@ -40,7 +40,16 @@ Include the script and use the `<md-editor>` tag:
 
 ### CSS Custom Properties
 
-Customize the editor's appearance using these CSS variables:
+Customize the editor's appearance using css:
+
+```stylesheet
+md-editor.my-theme {
+  --md-header-color: red;
+  --md-list-color: blue;
+}
+```
+
+Available CSS variables:
 
 | Variable | Description |
 | :--- | :--- |
@@ -54,6 +63,7 @@ Customize the editor's appearance using these CSS variables:
 | `--md-code-block-color` | Fenced code block text color |
 | `--md-code-block-bg` | Fenced code block background color |
 | `--md-link-color` | Link text color |
+
 
 ## License
 
