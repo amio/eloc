@@ -1,13 +1,14 @@
 # @amio/md-editor
 
-A high-performance Markdown editor Web Component using `contenteditable="plaintext-only"` and the **CSS Custom Highlight API**.
+A minimal Markdown editor web component with syntax highlighting.
+
+Implemented using `contenteditable="plaintext-only"` and the **CSS Custom Highlight API**.
 
 ## Features
 
 - **Native Speed**: Zero DOM manipulation for rendering. Styling is handled by the browser's Highlight API.
 - **Plaintext Input**: Uses `contenteditable="plaintext-only"` to ensure consistent behavior across browsers and prevent HTML injection.
 - **Theming**: Supports automatic (system-based) and manual light/dark themes.
-- **Encapsulated**: Built with Shadow DOM to prevent style leakage.
 
 ## Usage
 

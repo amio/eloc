@@ -1,7 +1,7 @@
 {
   "name": "@amio/md-editor",
   "version": "0.1.0",
-  "description": "A Markdown editor web component using CSS Custom Highlight API",
+  "description": "A minimal Markdown editor web component with syntax highlighting.",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "license": "MIT",
