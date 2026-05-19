@@ -50,6 +50,15 @@ test.describe('Eloc Presentation', () => {
     await expect(deck).toHaveJSProperty('index', 2);
   });
 
+  test('should reject save requests without save token', async ({ request }) => {
+    const response = await request.post('/api/save', {
+      data: { markdown: '# Unauthorized' },
+    });
+
+    expect(response.status()).toBe(403);
+    await expect(response.text()).resolves.toBe('Forbidden');
+  });
+
   test('should save changes using CTRL+S', async ({ page }) => {
     const originalDeck = await readFile(TEST_DECK_PATH, 'utf8');
 

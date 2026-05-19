@@ -1,19 +1,13 @@
-import fs from 'fs'
-import { join } from 'path'
+import markdownDeckSource from '../packages/markdown-deck/dist/markdown-deck.min.js?raw'
+import editingJsSource from './editing.js?raw'
 
 const { version } = require('../package.json')
 
 declare global {
   interface Window {
-    markdownSrc: string | null;
+    __elocSaveToken?: string;
   }
 }
-
-export const markdownDeckSource = fs.readFileSync(join(
-  __dirname, '../packages/markdown-deck/dist/markdown-deck.min.js',
-), 'utf8')
-
-export const editingJsSource = fs.readFileSync(join(__dirname, 'editing.js'))
 
 export interface IndexHTMLOptions {
   filename: string;
@@ -22,17 +16,19 @@ export interface IndexHTMLOptions {
   css?: string;
   dark?: boolean;
   progressBar?: boolean;
+  saveToken?: string;
 }
 
-export function createIndexHTML ({ filename, title, edit, css, dark, progressBar }: IndexHTMLOptions) {
-  const cssAttr = css ? `css="${css}"` : ''
+export function createIndexHTML ({ filename, title, edit, css, dark, progressBar, saveToken }: IndexHTMLOptions) {
+  const cssAttr = css ? `css="${escapeHtmlAttr(css)}"` : ''
   const progressBarAttr = progressBar ? 'progressBar' : ''
   const invertAttr = dark ? 'invert' : ''
+  const saveTokenScript = edit ? `<script>window.__elocSaveToken = ${toJsLiteral(saveToken || '')}</script>` : ''
 
-  const scriptContent = [
+  const scriptContent = escapeScriptContent([
     markdownDeckSource,
     edit && editingJsSource,
-  ].join(';')
+  ].join(';'))
 
   return `<!DOCTYPE html>
   <html>
@@ -40,7 +36,7 @@ export function createIndexHTML ({ filename, title, edit, css, dark, progressBar
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>${title || filename}</title>
+      <title>${escapeHtmlText(title || filename)}</title>
       <style>
         html, body { height: 100%; margin: 0 }
 
@@ -63,11 +59,33 @@ export function createIndexHTML ({ filename, title, edit, css, dark, progressBar
       <script>
         console.info('Built with eloc-cli (v${version})')
         const deck = document.querySelector('markdown-deck')
-        deck.src = new URL(document.location).searchParams.get('src') || "${filename}"
+        deck.src = new URL(document.location).searchParams.get('src') || ${toJsLiteral(filename)}
       </script>
+      ${saveTokenScript}
       <script>window.module = {}</script>
       <script>window.__dirname = ''</script>
       <script>${scriptContent}</script>
     </body>
   </html>`
+}
+
+function escapeHtmlText (value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function escapeHtmlAttr (value: string): string {
+  return escapeHtmlText(value)
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function escapeScriptContent (value: string): string {
+  return value.replace(/<\/script/gi, '<\\/script')
+}
+
+function toJsLiteral (value: string): string {
+  return JSON.stringify(value).replace(/<\/script/gi, '<\\/script')
 }

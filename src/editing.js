@@ -19,9 +19,14 @@
   })
 
   async function save (markdown) {
+    const headers = { 'Content-Type': 'application/json' }
+    if (window.__elocSaveToken) {
+      headers['X-Eloc-Save-Token'] = window.__elocSaveToken
+    }
+
     return fetch('/api/save', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ markdown })
     }).then(async res => {
       const msg = await res.text()

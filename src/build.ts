@@ -1,37 +1,34 @@
 import { cp, mkdir, writeFile } from 'node:fs/promises'
-import { join, basename, dirname } from 'node:path'
+import { join, dirname } from 'node:path'
 import { globby } from 'globby'
 
 import { createIndexHTML } from './assets'
+import { resolveDeckAssets } from './deck-assets'
 
 interface BuildOptions {
   'out-dir'?: string;
-  'include'?: string;
+  'include'?: string | string[];
   'title'?: string;
-  'css'?: string;
+  'css'?: string | string[];
   'dark'?: boolean;
   'progress-bar'?: boolean;
 }
 
 export default async function build (markdownFile: string, options: BuildOptions) {
-  const { 'out-dir': out = 'public', title, include, css, dark, 'progress-bar': progressBar } = options
+  const { 'out-dir': out = 'public', title, dark, 'progress-bar': progressBar } = options
   const dest = join(process.cwd(), out)
+  const deckAssets = resolveDeckAssets(markdownFile, options)
 
-  const filepath = join(process.cwd(), markdownFile)
-  const filename = basename(filepath)
-  const dir = dirname(filepath)
-
-  // copy files
-  const userAssets = [filename]
-    .concat(['*.png', '*.svg', '*.gif', '*.jpg']) // auto include images
-    .concat(include as string)
-    .concat(css as string)
-    .filter(Boolean)
-
-  await globCopy(userAssets, dir, dest)
+  await globCopy(deckAssets.assetGlobs, deckAssets.rootDir, dest)
 
   // write index.html
-  const indexHTML = createIndexHTML({ filename, title, css, dark, progressBar })
+  const indexHTML = createIndexHTML({
+    filename: deckAssets.filename,
+    title,
+    css: deckAssets.css,
+    dark,
+    progressBar
+  })
   await outputFile(join(dest, 'index.html'), indexHTML)
 }
 
