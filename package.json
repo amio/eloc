@@ -2,9 +2,14 @@
   "name": "eloc",
   "version": "1.4.1-alpha.2",
   "description": "1MB cli for markdown presentation authoring",
-  "repository": "amio/eloc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amio/eloc.git"
+  },
   "license": "MIT",
-  "bin": "dist/index.js",
+  "bin": {
+    "eloc": "dist/index.js"
+  },
   "files": [
     "dist/index.js",
     "README.md",

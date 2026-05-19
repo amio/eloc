@@ -22,14 +22,40 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build --if-present
       - run: npm test
-      - run: unset NODE_AUTH_TOKEN; unset NPM_TOKEN # Unset the default token set by "actions/setup-node" to get OIDC publishing working
-      - run: npm publish # The npm CLI automatically uses the OIDC token
+      - name: Determine npm dist-tag
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          NPM_DIST_TAG=$(printf '%s\n' "$PACKAGE_VERSION" | sed -nE 's/^[^-]+-([A-Za-z][0-9A-Za-z-]*).*/\1/p')
+          if [ -z "$NPM_DIST_TAG" ]; then
+            NPM_DIST_TAG=latest
+            IS_PRERELEASE=false
+          else
+            IS_PRERELEASE=true
+          fi
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> "$GITHUB_ENV"
+          echo "NPM_DIST_TAG=$NPM_DIST_TAG" >> "$GITHUB_ENV"
+          echo "IS_PRERELEASE=$IS_PRERELEASE" >> "$GITHUB_ENV"
+      - name: Publish package
+        run: |
+          unset NODE_AUTH_TOKEN
+          unset NPM_TOKEN
+          echo "Publishing $PACKAGE_VERSION with dist-tag $NPM_DIST_TAG"
+          npm publish --tag "$NPM_DIST_TAG"
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            --title "$GITHUB_REF_NAME" \
-            --generate-notes
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            echo "Creating prerelease for $GITHUB_REF_NAME"
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --generate-notes \
+              --prerelease
+          else
+            echo "Creating release for $GITHUB_REF_NAME"
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --generate-notes
+          fi
