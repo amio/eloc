@@ -60,14 +60,6 @@ updates:
     - 0.9.5
     - 0.9.6
     - 0.9.7
-  - dependency-name: micromatch
-    versions:
-    - 4.0.3
-  - dependency-name: "@vercel/ncc"
-    versions:
-    - 0.28.0
-    - 0.28.1
-    - 0.28.2
   - dependency-name: "@types/fs-extra"
     versions:
     - 9.0.10

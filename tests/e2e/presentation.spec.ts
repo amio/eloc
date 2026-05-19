@@ -1,7 +1,11 @@
 /// <reference types="node" />
+import { readFile, writeFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
 
+const TEST_DECK_PATH = 'tests/e2e/test-deck.md';
+
 test.describe('Eloc Presentation', () => {
+  test.describe.configure({ mode: 'serial' });
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('markdown-deck');
@@ -11,8 +15,8 @@ test.describe('Eloc Presentation', () => {
     const deck = page.locator('markdown-deck');
     await expect(deck).toBeVisible();
     // Check if the first slide content is present
-    // The default deck.md starts with # eloc
-    const heading = page.locator('markdown-deck').locator('h2:has-text("eloc")');
+    // The test deck starts with ## eloc
+    const heading = page.locator('markdown-deck').locator('#deck h2:has-text("eloc")');
     // Note: markdown-deck renders into shadow DOM, so we might need to pierce it
     // Playwright locator pierces shadow DOM by default.
     await expect(heading).toBeVisible();
@@ -44,22 +48,28 @@ test.describe('Eloc Presentation', () => {
   });
 
   test('should save changes using CTRL+S', async ({ page }) => {
-    await page.keyboard.press('Escape'); // Open editor
-    const editor = page.locator('markdown-deck textarea.editor');
-    await editor.fill('# New Content\n---\n# Slide 2');
+    const originalDeck = await readFile(TEST_DECK_PATH, 'utf8');
 
-    // Intercept the save request
-    const savePromise = page.waitForResponse(response =>
-      response.url().includes('/api/save') && response.status() === 200
-    );
+    try {
+      await page.keyboard.press('Escape'); // Open editor
+      const editor = page.locator('markdown-deck textarea.editor');
+      await editor.fill('# New Content\n---\n# Slide 2');
 
-    if (process.platform === 'darwin') {
-      await page.keyboard.press('Meta+s');
-    } else {
-      await page.keyboard.press('Control+s');
+      // Intercept the save request
+      const savePromise = page.waitForResponse(response =>
+        response.url().includes('/api/save') && response.status() === 200
+      );
+
+      if (process.platform === 'darwin') {
+        await page.keyboard.press('Meta+s');
+      } else {
+        await page.keyboard.press('Control+s');
+      }
+
+      const response = await savePromise;
+      expect(response.ok()).toBe(true);
+    } finally {
+      await writeFile(TEST_DECK_PATH, originalDeck);
     }
-
-    const response = await savePromise;
-    expect(response.ok()).toBe(true);
   });
 });

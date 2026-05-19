@@ -268,7 +268,7 @@ export class MarkdownDeck extends LitElement {
 
     // sync deck with editor
     const editor: HTMLTextAreaElement = this.shadowRoot.querySelector('textarea')
-    const textBeforeCaret = editor.value.substr(0, editor.selectionStart + 2)
+    const textBeforeCaret = editor.value.slice(0, editor.selectionStart + 2)
     const pageIndex = splitMarkdownToPages(textBeforeCaret).length - 1
     this.markdown = editor.value
     this.index = pageIndex
@@ -452,7 +452,7 @@ function trimIndent (text: string): string {
     return leadingIndentCount < accu ? leadingIndentCount : accu
   }, lines[0].length)
 
-  const indentChars = lines[0].substr(0, indentCount)
+  const indentChars = lines[0].slice(0, indentCount)
   return lines.map(line => line.replace(indentChars, '')).join('\n')
 }
 
@@ -470,7 +470,7 @@ function scrollTextareaTo (textarea: HTMLTextAreaElement, start: number) {
   if (start === 0) return
 
   const content = textarea.value
-  textarea.value = content.substr(0, start)
+  textarea.value = content.slice(0, start)
 
   const originalScrollHeight = textarea.scrollHeight
   textarea.style.paddingBottom = textarea.scrollHeight + 'px'
