@@ -7,7 +7,10 @@ const TEST_DECK_PATH = 'tests/e2e/test-deck.md';
 test.describe('Eloc Presentation', () => {
   test.describe.configure({ mode: 'serial' });
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.addInitScript(() => {
+      (window as Window & { mddSkipLoadingFont?: boolean }).mddSkipLoadingFont = true;
+    });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('markdown-deck');
   });
 
