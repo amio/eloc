@@ -54,9 +54,11 @@ test.describe('Eloc Presentation', () => {
     const originalDeck = await readFile(TEST_DECK_PATH, 'utf8');
 
     try {
+      const updatedDeck = '# New Content\n---\n# Slide 2';
+
       await page.keyboard.press('Escape'); // Open editor
       const editor = page.locator('markdown-deck textarea.editor');
-      await editor.fill('# New Content\n---\n# Slide 2');
+      await editor.fill(updatedDeck);
 
       // Intercept the save request
       const savePromise = page.waitForResponse(response =>
@@ -71,6 +73,7 @@ test.describe('Eloc Presentation', () => {
 
       const response = await savePromise;
       expect(response.ok()).toBe(true);
+      await expect(readFile(TEST_DECK_PATH, 'utf8')).resolves.toBe(updatedDeck);
     } finally {
       await writeFile(TEST_DECK_PATH, originalDeck);
     }
