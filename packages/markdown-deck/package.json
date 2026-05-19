@@ -12,6 +12,7 @@
     "preview": "sirv .",
     "start": "npm run build -- --watch",
     "build": "esbuild src/index.ts --outfile=dist/markdown-deck.min.js --bundle --minify --sourcemap --format=iife",
+    "build:site": "npm run build && npm run build-deck",
     "build-deck": "rm -rf public && mkdir public && cp -R dist public && cp *.html deck.* public",
     "prepack": "npm run build"
   },

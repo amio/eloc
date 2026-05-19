@@ -1,4 +1,6 @@
 {
   "version": 2,
-  "alias": "markdown-deck.vercel.app"
+  "alias": "markdown-deck.vercel.app",
+  "buildCommand": "npm run build:site",
+  "outputDirectory": "public"
 }
