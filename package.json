@@ -5,6 +5,12 @@
   "repository": "amio/eloc",
   "license": "MIT",
   "bin": "dist/index.js",
+  "files": [
+    "dist/index.js",
+    "README.md",
+    "LICENSE.md",
+    "package.json"
+  ],
   "scripts": {
     "bootstrap-deps": "npm run build -w markdown-deck",
     "test": "npm test -w markdown-deck && npm run build && npm run test:e2e",
