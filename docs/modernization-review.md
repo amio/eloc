@@ -2,23 +2,23 @@
 
 ## Background
 
-This document captures a first-pass modernization review of the `eloc` codebase. The goal is to identify obsolete implementations and dependency choices that can be replaced with modern platform APIs or simpler dependencies, while keeping this pass low risk and avoiding functional rewrites.
+This document records the modernization review and follow-up cleanup for `eloc`. The goal is to replace obsolete implementation patterns with modern Node/browser platform APIs or smaller dependencies while preserving current CLI behavior.
 
-The project has already undergone a dependency upgrade pass, documented in `docs/2026-05-16-dependency-upgrade.md`. This review therefore focuses less on package version freshness and more on implementation patterns, dependency necessity, and safe cleanup opportunities.
+The first pass removed unused direct dependencies and small deprecated browser idioms. The second pass intentionally raises the Node runtime floor to Node 22 so the CLI can use modern `node:` imports, `fs/promises`, async request body iteration, and WHATWG URL parsing without compatibility shims.
 
 ## Current architecture
 
 `eloc` is an npm workspace with three main packages:
 
-- Root package `eloc`: the CLI and presentation server.
-- Workspace `packages/markdown-deck`: the presentation web component.
-- Workspace `packages/md-editor`: a standalone markdown editor web component.
+- Root package `eloc`: CLI, static build, and local presentation server.
+- Workspace `packages/markdown-deck`: Lit-based presentation web component.
+- Workspace `packages/md-editor`: standalone markdown editor web component.
 
 Root CLI modules:
 
 - `src/index.ts`: CLI entry point. Uses `mri` for argument parsing and `kleur` for terminal styling, then dispatches to serve or build mode.
-- `src/serve.ts`: creates an HTTP server, serves the generated presentation page, serves static files, and handles `/api/save` for live editor saves.
-- `src/build.ts`: copies the markdown file and assets into an output directory and writes `index.html`.
+- `src/serve.ts`: Node HTTP server. It now uses native routing and JSON parsing plus `sirv` for static file serving.
+- `src/build.ts`: static export. It now uses `node:fs/promises` instead of `fs-extra`.
 - `src/assets.ts`: embeds the bundled `markdown-deck` component and optional editor helper script into generated HTML.
 - `src/editing.js`: browser-side save shortcut and toast UI embedded into served/built HTML.
 
@@ -34,164 +34,149 @@ Build and validation setup:
 - Root `build` bundles `src/index.ts` with esbuild for Node.
 - Root `prebuild` builds `markdown-deck`, clears `dist`, creates `dist`, and copies `src/editing.js`.
 - Root `test:e2e` runs Playwright against the built CLI server.
-- `markdown-deck` has a Jest test script for utility tests and an esbuild IIFE bundle.
+- `markdown-deck` has Jest utility tests and an esbuild IIFE bundle.
 - `md-editor` has an esbuild ESM bundle.
 
-## Candidates
+## Completed modernization
 
-### Replace small server dependencies with platform APIs
+### Dependency surface cleanup
 
-`src/serve.ts` currently uses:
-
-- `micro-fork` for routing.
-- `micri` for JSON body parsing.
-- `serve-handler` for static file serving.
-
-For this codebase, the routing surface is small: `/`, `/api/save`, and static file fallback. Modern Node APIs are sufficient for request routing, JSON body parsing, and static file reads. Replacing these dependencies would reduce install size and maintenance surface, but it touches request handling and should be validated carefully.
-
-### Reduce `fs-extra` usage
-
-`src/build.ts` uses `fs-extra` for `copy` and `outputFile`. Modern `fs/promises` supports recursive directory creation, file writes, and file copying with `fs.cp` in supported Node versions. Because the package currently declares `node >=16`, compatibility details must be checked before replacing `fs-extra`; the safest path is to defer or gate this behind a Node engine decision.
-
-### Remove apparently unused direct dependencies
-
-The source review found no application usage for these root direct dependencies outside manifests, lockfile, and dependency-management configuration:
+Removed unused direct root dev dependencies:
 
 - `@vercel/ncc`
 - `micromatch`
 - `@types/micromatch`
 
-One final confirmation pass should include `.github/dependabot.yml`, because Dependabot configuration may reference `@vercel/ncc` or `micromatch` even when application source does not.
+`micromatch` remains transitively through `globby`/`fast-glob`, which is expected.
 
-`micromatch` is still expected to remain in the resolved dependency graph transitively through `globby`/`fast-glob`. The cleanup should therefore be described as removing only direct dependencies from the root manifest, not removing every `micromatch` entry from `package-lock.json` or the install tree.
+### Server stack consolidation
 
-Expected impact is mainly reduced direct dependency surface and less root manifest/lockfile ownership. Bundle output should not change if these packages are truly unused by application code, and install-size impact may be modest because transitive `micromatch` remains.
+Replaced the previous three-package local server stack with one focused library plus Node 22 platform APIs:
 
-### Treat deployment naming and stale links conservatively
+- Removed routing/body/static stack:
+  - `micro-fork`
+  - `micri`
+  - `serve-handler`
+  - `@types/serve-handler`
+- Added:
+  - `sirv` for static file serving
+  - `sirv-cli` for the `markdown-deck` preview command, replacing the heavier `serve` dev tool
+- Implemented with native Node 22 APIs:
+  - request routing via `node:http` and `URL`
+  - JSON body reading via async iteration over `IncomingMessage`
+  - save writes via `node:fs/promises`
 
-The repo still contains legacy Vercel/Now-era naming and URLs:
+The served routes remain intentionally small:
 
-- `now-build` scripts in the root package and `markdown-deck`.
-- `now.sh` references in README/demo material.
-- `packages/markdown-deck/vercel.json` alias still points at `markdown-deck.now.sh`.
+- `GET /` and `HEAD /`: generated presentation HTML with editor enabled.
+- `POST /api/save`: save live editor markdown back to the source file.
+- `GET`/`HEAD` fallback: static files from the current working directory.
 
-Do not rename or remove `now-build` in this pass. Deployment may still depend on that legacy script name. If deployment ownership confirms it is safe, an optional parallel `vercel-build` alias can be added while keeping `now-build` intact.
+### Server library research
 
-Do not blindly rewrite `now.sh` URLs. Validate each URL against the current deployment/canonical destination first, or defer documentation link updates to a separate docs pass.
+Compared candidates for replacing the old server trio:
 
-### Update TypeScript module settings deliberately
+| Candidate | Role | Direct dependency profile | Fit |
+| --- | --- | --- | --- |
+| `sirv` | Static file middleware | ~22 KB unpacked, 3 small deps | Best fit: lets this project keep routing/body parsing native and delegate only safe static-file edge cases. |
+| `polka` | Micro router/server | ~25 KB unpacked, 2 deps | Would replace routing, but static serving still needs another library or custom implementation. |
+| `hono` + Node adapter | Full web framework | adapter plus framework | Excellent API, but more framework than this CLI needs. |
+| `h3` | Full HTTP framework | larger framework package | Too broad for three routes. |
+| `@tinyhttp/app` | Express-like app | several framework deps | More API and dependency surface than needed. |
 
-The root `tsconfig.json` uses older defaults such as:
+Chosen approach: `sirv` only. It preserves robust static file behavior and keeps routing/body handling in a short local function using modern Node APIs.
 
-- `target: es2017`
-- `module: commonjs`
-- `moduleResolution: node`
+### Node 22 floor and `fs-extra` removal
 
-The workspace packages also use `moduleResolution: node`. Because esbuild handles bundling, moving to more modern TypeScript settings such as `moduleResolution: bundler` or `node16` should be evaluated separately and validated against package output, tests, and Node runtime support.
+Raised the root `engines.node` requirement from `>=16` to `>=22` and documented the new runtime floor in the README.
 
-### Browser/editor implementation modernization
+Removed direct root dependencies:
 
-The web components already use modern APIs such as Lit 3, `AbortController`, `ResizeObserver`, constructable stylesheets, and CSS Custom Highlight API. Some older or fragile implementation details remain:
+- `fs-extra`
+- `@types/fs-extra`
 
-- `substr` in `markdown-deck.ts` can be replaced with `slice`.
-- The live editor in `markdown-deck` is a plain `textarea`; the standalone `md-editor` is not integrated into the CLI editing experience.
-- `md-editor` relies on newer browser APIs and should retain graceful fallback behavior.
+`src/build.ts` now uses:
 
-The `substr` to `slice` cleanup is trivial and low-risk if package tests pass. Broader editor integration or behavior changes should not be part of the low-risk dependency cleanup pass unless a specific bug or product goal requires them.
+- `fs.promises.cp` for copying matched deck/assets files.
+- `fs.promises.mkdir` with `recursive: true` before writes/copies.
+- `fs.promises.writeFile` for generated `index.html`.
 
-## Recommended scope
+### Deployment script cleanup
 
-For this pass, keep the scope small and low-risk:
+Removed legacy `now-build` scripts from:
 
-1. Remove direct dependencies that appear unused:
-   - `@vercel/ncc`
-   - `micromatch`
-   - `@types/micromatch`
-2. Confirm related metadata before removal:
-   - Check root manifests, `package-lock.json`, and `.github/dependabot.yml` for direct references.
-   - Expect `micromatch` to remain transitively through `globby`/`fast-glob`; only direct root dependency ownership should be removed.
-3. Keep legacy deployment scripts unchanged this pass:
-   - Do not rename or remove `now-build`.
-   - Add an optional parallel `vercel-build` alias only if deployment validation confirms it is safe and useful.
-4. Defer stale `now.sh` documentation/demo URL changes unless each replacement URL is validated.
-5. Replace trivial JavaScript idioms with no behavior change where already touched and tests pass:
-   - `substr` to `slice` in browser code.
-6. Validate install and bundle behavior:
-   - Confirm install still succeeds.
-   - Confirm direct dependency removal does not imply transitive `micromatch` disappears.
-   - Confirm generated bundle/output files are unchanged in behavior and still produced.
+- root `package.json`
+- `packages/markdown-deck/package.json`
+
+The remaining build paths are explicit:
+
+- root `npm run build`
+- `npm run build -w markdown-deck`
+- `npm run build-deck -w markdown-deck`
+
+### Legacy hosted URL cleanup
+
+Validated and updated legacy hosted links:
+
+- `https://eloc-screenshot.vercel.app` returned 200 and replaced the old screenshot URL.
+- `https://eloc.vercel.app/#6` returned 200 and replaced the old demo URL.
+- `https://el-capitan.vercel.app` returned 200 and replaced old background-image demo URLs.
+- `https://markdown-deck.vercel.app` returned 200 and replaced the old Vercel alias target.
+- PackagePhobia's old URL redirected to a Vercel-hosted endpoint but returned 429 from the Vercel security checkpoint in automated validation. The README install-size link was moved to `https://pkg-size.dev/eloc`, which returned 200.
 
 ## Deferred items
 
-Defer these until after the low-risk cleanup lands:
+Defer these until a clear product or maintenance need appears:
 
-- Replacing `micro-fork`, `micri`, and `serve-handler` with native Node request handling.
-- Replacing `fs-extra` with `fs/promises`, unless the project first raises or confirms the Node engine target supports the required APIs.
 - Changing TypeScript module resolution or package output formats.
 - Integrating `@amio/md-editor` into the CLI live editor.
 - Changing markdown parsing, slide splitting behavior, or `marked` token processing.
 - Reworking presentation rendering, font loading, or syntax highlighting.
 - Broad dependency replacement for `mri`, `kleur`, `globby`, `open`, `marked`, `lit`, or `prismjs` without a clear benefit.
 
-## Risks
+## Risks and mitigations
 
-- Removing dependencies may break hidden scripts or publishing/deployment workflows if those tools are used outside source files.
-- Renaming or removing `now-build` could break an older Vercel/Now deployment configuration if it still expects that script name.
-- Blindly changing `now.sh` URLs could replace still-valid demo or alias links with incorrect destinations.
-- Replacing the HTTP server stack could introduce subtle regressions in static file paths, caching headers, content types, URL decoding, or request body handling.
-- Replacing `fs-extra` may be constrained by the current `node >=16` engine declaration and the exact Node 16 minor version expected by users.
-- TypeScript module setting changes can affect esbuild resolution, package workspace resolution, and CommonJS/ESM interop.
-- Browser editor changes could affect selection sync, live editing, keyboard shortcuts, or shadow DOM behavior.
-- `md-editor` uses newer browser APIs; treating it as a drop-in replacement for the existing textarea editor would require compatibility and UX validation.
+- Static serving behavior can regress around path decoding, directory traversal, content types, conditional requests, or cache headers. Mitigation: use `sirv` rather than handwritten static serving and keep `Cache-Control: no-cache`.
+- Save behavior can regress if body parsing changes. Mitigation: keep the same `/api/save` JSON shape and cover it with Playwright.
+- Raising Node to 22 is a breaking runtime requirement for old environments. Mitigation: the package manifest now states the new engine floor explicitly.
+- Removing deployment scripts can break external deployment settings if they still call those exact script names. Mitigation: current repo build scripts are explicit; external deployment configuration should call `npm run build` or the workspace `build-deck` path directly.
+- Hosted URL checks can be affected by bot protection. Mitigation: only URLs that returned 200 were used directly, except the PackagePhobia page, which was replaced with a different validated package-size page.
 
-## Validation
+## Validation plan
 
-Run validation in increasing scope after each small change:
+Run validation in increasing scope after server/build dependency changes:
 
 1. Dependency and install sanity:
    - `npm install`
    - `npm ls --depth=0 --workspaces --include-workspace-root`
-   - Confirm `@vercel/ncc`, direct `micromatch`, and `@types/micromatch` are no longer root-owned direct dependencies.
-   - Confirm any remaining `micromatch` entries are expected transitive dependencies through `globby`/`fast-glob`.
+   - Confirm removed packages are no longer root-owned direct dependencies.
 2. Package builds:
    - `npm run build -w markdown-deck`
    - `npm run build -w @amio/md-editor`
    - `npm run build`
-3. Package tests relevant to touched workspaces:
-   - `npm test -w markdown-deck` if `packages/markdown-deck` code is touched, including the `substr` to `slice` cleanup.
+3. Package tests:
+   - `npm test -w markdown-deck`
 4. CLI smoke tests:
    - `node dist/index.js --help`
    - `node dist/index.js --version`
    - `node dist/index.js build deck.md -o public-modernization-smoke`
-   - Assert expected build output files exist, especially `public-modernization-smoke/index.html` and copied markdown/assets for the chosen smoke fixture.
-5. E2E tests:
+   - Assert `public-modernization-smoke/index.html` and copied markdown/assets exist.
+5. Server/E2E tests:
    - `npm run test:e2e`
-   - Existing Playwright coverage already exercises serve mode; avoid adding redundant serve smoke coverage unless a server change is made in a later pass.
-   - Avoid mutating checked-in E2E fixtures during validation. If a save-flow test or manual check mutates a fixture, restore it before finishing and verify the working tree is clean.
-6. Manual smoke checks for any server-related follow-up pass:
-   - Serve a markdown deck.
-   - Navigate with keyboard and hash sync.
-   - Toggle editor with Escape.
-   - Save edits with Cmd/Ctrl+S.
-   - Verify included image/CSS assets are served and copied correctly.
+   - Verify first slide rendering, keyboard navigation, editor toggle, hash sync, and `/api/save`.
+   - Ensure the save-flow test restores the checked-in E2E fixture.
+6. URL validation:
+   - Validate each replacement hosted URL with redirects followed and confirm status 200 before updating docs/demo references.
 
-## Change list
+## Current change list
 
-Recommended concrete changes for the low-risk pass:
+Completed changes in this modernization pass:
 
-1. Remove unused direct root dependencies from `package.json` and regenerate `package-lock.json`:
-   - `@vercel/ncc`
-   - `micromatch`
-   - `@types/micromatch`
-2. Check `.github/dependabot.yml` and other dependency-management metadata for references to `@vercel/ncc` or `micromatch`; update only if those references become invalid after direct dependency removal.
-3. Leave `now-build` scripts in place this pass:
-   - Root `package.json`
-   - `packages/markdown-deck/package.json`
-4. Add a parallel `vercel-build` script only if deployment validation confirms it is safe; do not remove or rename `now-build`.
-5. Defer `now.sh` README/demo URL updates unless each replacement destination is validated.
-6. Replace simple deprecated string usage where behavior is unchanged and tests pass:
-   - `substr` to `slice` in `packages/markdown-deck/src/markdown-deck.ts`.
-7. Add or document CLI build smoke validation that asserts expected output files, while relying on existing Playwright coverage for serve mode.
-8. Avoid mutating checked-in E2E fixtures during validation, or restore them before finishing.
-9. Open a follow-up design/task for replacing `micro-fork`, `micri`, and `serve-handler` with a small native Node HTTP implementation.
-10. Open a follow-up design/task for evaluating Node engine support and whether `fs-extra` can be replaced by `fs/promises`.
+1. Consolidated `micro-fork`, `micri`, and `serve-handler` into `sirv` plus native Node HTTP/URL/body parsing.
+2. Raised root Node engine to `>=22`.
+3. Removed `fs-extra` and migrated build copy/write logic to `node:fs/promises`.
+4. Removed legacy `now-build` scripts.
+5. Updated legacy hosted demo/screenshot/background/alias links to validated modern destinations.
+6. Replaced the `markdown-deck` preview dev server from `serve` to `sirv-cli`, removing the old static-server stack from the lockfile entirely.
+7. Updated dependency-management metadata for removed dependencies.
+8. Kept existing tests and added fixture restoration around the save-flow E2E test.

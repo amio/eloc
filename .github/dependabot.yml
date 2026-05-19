@@ -60,11 +60,6 @@ updates:
     - 0.9.5
     - 0.9.6
     - 0.9.7
-  - dependency-name: "@types/fs-extra"
-    versions:
-    - 9.0.10
-    - 9.0.8
-    - 9.0.9
   - dependency-name: typescript
     versions:
     - 4.1.4
@@ -74,9 +69,6 @@ updates:
   - dependency-name: marked
     versions:
     - 2.0.1
-  - dependency-name: micri
-    versions:
-    - 4.3.0
   - dependency-name: bili
     versions:
     - 5.0.5

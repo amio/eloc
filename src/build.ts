@@ -1,6 +1,6 @@
-import { join, basename, dirname } from 'path'
+import { cp, mkdir, writeFile } from 'node:fs/promises'
+import { join, basename, dirname } from 'node:path'
 import { globby } from 'globby'
-import fse from 'fs-extra'
 
 import { createIndexHTML } from './assets'
 
@@ -32,14 +32,21 @@ export default async function build (markdownFile: string, options: BuildOptions
 
   // write index.html
   const indexHTML = createIndexHTML({ filename, title, css, dark, progressBar })
-  await fse.outputFile(join(dest, 'index.html'), indexHTML)
+  await outputFile(join(dest, 'index.html'), indexHTML)
 }
 
 async function globCopy (globs: string[], source: string, dest: string) {
   const files = await globby(globs, { cwd: source })
 
-  return Promise.all(files.map(file => fse.copy(
-    join(source, file),
-    join(dest, file)
-  )))
+  return Promise.all(files.map(async file => {
+    const target = join(dest, file)
+
+    await mkdir(dirname(target), { recursive: true })
+    await cp(join(source, file), target, { recursive: true })
+  }))
+}
+
+async function outputFile (file: string, content: string) {
+  await mkdir(dirname(file), { recursive: true })
+  await writeFile(file, content)
 }

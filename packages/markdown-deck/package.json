@@ -9,11 +9,10 @@
   "scripts": {
     "test": "jest",
     "prestart": "rm -rf dist",
-    "preview": "serve .",
+    "preview": "sirv .",
     "start": "npm run build -- --watch",
     "build": "esbuild src/index.ts --outfile=dist/markdown-deck.min.js --bundle --minify --sourcemap --format=iife",
     "build-deck": "rm -rf public && mkdir public && cp -R dist public && cp *.html deck.* public",
-    "now-build": "npm run build && npm run build-deck",
     "prepack": "npm run build"
   },
   "dependencies": {
@@ -26,7 +25,7 @@
     "esbuild": "^0.28.0",
     "jest": "^30.4.2",
     "lit": "^3.3.3",
-    "serve": "^14.2.6",
+    "sirv-cli": "^3.0.1",
     "ts-jest": "^29.4.9",
     "typescript": "^6.0.3"
   }

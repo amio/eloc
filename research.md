@@ -31,7 +31,8 @@ The repository is organized as follows:
 - **CLI Utilities**:
   - `mri`: Argument parsing.
   - `kleur`: Terminal styling.
-  - `micro-fork` & `micri`: Lightweight HTTP server and routing.
+  - `sirv` / `sirv-cli`: Lightweight static file serving for the local presentation server and preview command.
+  - Native Node 22 HTTP APIs: routing, JSON body parsing, and file writes for the live editor server.
   - `globby`: File globbing for assets.
 
 ## Specificities

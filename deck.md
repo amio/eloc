@@ -72,7 +72,7 @@ Press <kbd>esc</kbd> to __edit me__ :)
 
 <style>
 .slide {
-  background: url(https://el-capitan.now.sh) center;
+  background: url(https://el-capitan.vercel.app) center;
   background-size: cover;
 }
 .content { filter: invert() }

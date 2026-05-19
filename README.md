@@ -28,9 +28,11 @@ Brown fox jumps over the lazy dog.
 
 then `eloc slides.md` gives you the presentation with live editor:
 
-<p align="center"><img src="https://eloc-screenshot.now.sh" width="100%" /></p>
+<p align="center"><img src="https://eloc-screenshot.vercel.app" width="100%" /></p>
 
 ## Install
+
+Requires Node.js 22 or newer.
 
 ```bash
 npm install -g eloc
@@ -77,7 +79,7 @@ npm install -g eloc
 
 - Use `--css` arg with an external stylesheet, which will be applied on every slide.
 
-- Use inline `<style />` for [per-slide customization](https://eloc.now.sh/#6):
+- Use inline `<style />` for [per-slide customization](https://eloc.vercel.app/#6):
 
   ```
   _write style tag within markdown_
@@ -106,6 +108,6 @@ npm install -g eloc
 [coverage-src]: https://badgen.net/codecov/c/github/amio/eloc
 [coverage-href]: https://codecov.io/gh/amio/eloc
 [packagephobia-src]: https://badgen.net/packagephobia/install/eloc
-[packagephobia-href]: https://packagephobia.now.sh/result?p=eloc
+[packagephobia-href]: https://pkg-size.dev/eloc
 [license-src]: https://badgen.net/badge/license/MIT
 [license-href]: LICENSE.md
