@@ -17,6 +17,7 @@
     "dev": "npm run build -- --watch ### NOTE: Use `node dist` to test run cli",
     "prebuild": "npm run bootstrap-deps && rm -rf dist",
     "build": "node scripts/build.mjs",
+    "build:site": "npm run build && node dist/index.js build deck.md",
     "test:e2e": "playwright test",
     "prepack": "npm run build"
   },

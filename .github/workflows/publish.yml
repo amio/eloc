@@ -19,6 +19,7 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org' # Specifies the npm registry
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - run: npm run build --if-present
       - run: npm test
       - run: unset NODE_AUTH_TOKEN; unset NPM_TOKEN # Unset the default token set by "actions/setup-node" to get OIDC publishing working
