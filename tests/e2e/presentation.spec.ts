@@ -1,9 +1,9 @@
+/// <reference types="node" />
 import { test, expect } from '@playwright/test';
 
 test.describe('Eloc Presentation', () => {
   test.beforeEach(async ({ page }) => {
-    // We assume the server is running on localhost:5000
-    await page.goto('http://localhost:5000');
+    await page.goto('/');
     await page.waitForSelector('markdown-deck');
   });
 
@@ -14,7 +14,8 @@ test.describe('Eloc Presentation', () => {
     // The default deck.md starts with # eloc
     const heading = page.locator('markdown-deck').locator('h2:has-text("eloc")');
     // Note: markdown-deck renders into shadow DOM, so we might need to pierce it
-    // Playwright locator pierce shadow DOM by default.
+    // Playwright locator pierces shadow DOM by default.
+    await expect(heading).toBeVisible();
   });
 
   test('should navigate between slides using keyboard', async ({ page }) => {
@@ -35,7 +36,7 @@ test.describe('Eloc Presentation', () => {
   });
 
   test('should sync with location hash', async ({ page }) => {
-    await page.goto('http://localhost:5000/#2');
+    await page.goto('/#2');
     await expect(page).toHaveURL(/.*#2/);
     // The index property of markdown-deck should be 2
     const deck = page.locator('markdown-deck');

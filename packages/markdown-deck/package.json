@@ -17,17 +17,17 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "marked": "^17.0.3",
-    "marked-highlight": "^2.2.1",
-    "prismjs": "^1.22.0"
+    "marked": "^18.0.3",
+    "marked-highlight": "^2.2.4",
+    "prismjs": "^1.30.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "esbuild": "^0.27.3",
-    "jest": "^30.0.3",
-    "lit": "^3.0.2",
-    "serve": "^14.1.2",
-    "ts-jest": "^29.0.5",
-    "typescript": "^5.1.6"
+    "esbuild": "^0.28.0",
+    "jest": "^30.4.2",
+    "lit": "^3.3.3",
+    "serve": "^14.2.6",
+    "ts-jest": "^29.4.9",
+    "typescript": "^6.0.3"
   }
 }
