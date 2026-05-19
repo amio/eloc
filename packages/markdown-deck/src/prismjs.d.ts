@@ -1,0 +1,7 @@
+declare module 'prismjs'
+declare module 'prismjs/components/prism-python'
+declare module 'prismjs/components/prism-bash'
+declare module 'prismjs/components/prism-go'
+declare module 'prismjs/components/prism-sql'
+declare module 'prismjs/components/prism-rust'
+declare module 'prismjs/components/prism-csharp'

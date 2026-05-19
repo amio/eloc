@@ -30,9 +30,9 @@ class ResizeController implements ReactiveController {
 
 @customElement('markdown-deck')
 export class MarkdownDeck extends LitElement {
-  @property({ type: String }) markdown: string      // markdown content to present
-  @property({ type: String }) src: string           // markdown file url to load
-  @property({ type: String }) css: string           // custom css url to load
+  @property({ type: String }) markdown?: string     // markdown content to present
+  @property({ type: String }) src?: string          // markdown file url to load
+  @property({ type: String }) css?: string          // custom css url to load
   @property({ type: Number }) index = 0             // current slide index
 
   // feature switch
@@ -46,13 +46,13 @@ export class MarkdownDeck extends LitElement {
   @property({ type: Boolean }) invert = false       // invert color
 
   // watched private properties
-  @property({ type: Array }) _pages = []            // split markdown to pages
+  @property({ type: Array }) _pages: string[] = []  // split markdown to pages
   @property({ type: String }) _stylesheet = ''      // custom stylesheet
 
   // private properties
-  _touchStart: { clientX: number, clientY: number } // handle for remove swipe listener
-  _markdownAbortController: AbortController
-  _cssAbortController: AbortController
+  _touchStart?: { clientX: number, clientY: number } // handle for remove swipe listener
+  _markdownAbortController?: AbortController
+  _cssAbortController?: AbortController
 
   constructor() {
     super();
@@ -175,12 +175,12 @@ export class MarkdownDeck extends LitElement {
       this._updatePages()
     }
 
-    if (changedProps.has('src')) {
-      this.src && this._loadMarkdownFile(this.src)
+    if (changedProps.has('src') && this.src) {
+      this._loadMarkdownFile(this.src)
     }
 
-    if (changedProps.has('css')) {
-      this.css && this._loadCSSFile(this.css)
+    if (changedProps.has('css') && this.css) {
+      this._loadCSSFile(this.css)
     }
 
     // return true if any changed prop is not in omitProps
@@ -227,7 +227,9 @@ export class MarkdownDeck extends LitElement {
   }
 
   _syncEditorSelection () {
-    const textarea = this.shadowRoot.querySelector('textarea')
+    const textarea = this.shadowRoot?.querySelector<HTMLTextAreaElement>('textarea')
+    if (!textarea) return
+
     if (this.markdown) {
       const [start, end] = getRangeByIndex(this.markdown, this.index)
       scrollTextareaTo(textarea, start)
@@ -247,12 +249,12 @@ export class MarkdownDeck extends LitElement {
 
   _readMarkdownScript () {
     const scriptTag = this.querySelector('script[type="text/markdown"]')
-    return scriptTag ? trimIndent(scriptTag.textContent) : ''
+    return scriptTag ? trimIndent(scriptTag.textContent ?? '') : ''
   }
 
   _readCustomStyles () {
     const styleTag = this.querySelector('style')
-    return `${this._stylesheet}\n${styleTag ? styleTag.textContent : ''}`
+    return `${this._stylesheet}\n${styleTag?.textContent ?? ''}`
   }
 
   _updatePages () {
@@ -267,7 +269,9 @@ export class MarkdownDeck extends LitElement {
     }
 
     // sync deck with editor
-    const editor: HTMLTextAreaElement = this.shadowRoot.querySelector('textarea')
+    const editor = this.shadowRoot?.querySelector<HTMLTextAreaElement>('textarea')
+    if (!editor) return
+
     const textBeforeCaret = editor.value.slice(0, editor.selectionStart + 2)
     const pageIndex = splitMarkdownToPages(textBeforeCaret).length - 1
     this.markdown = editor.value
@@ -280,6 +284,8 @@ export class MarkdownDeck extends LitElement {
   }
 
   _handleTouchEnd = (ev: TouchEvent) => {
+    if (!this._touchStart) return
+
     const { clientX, clientY } = ev.changedTouches[0]
     const deltaX = clientX - this._touchStart.clientX
     const deltaY = clientY - this._touchStart.clientY
@@ -434,7 +440,7 @@ function injectFontCSS (url: string) {
 }
 
 function injectWebFont (css: string) {
-  if (Array.from(window.document.head.querySelectorAll('style')).some(s => s.textContent.includes(css.substring(0, 100)))) return
+  if (Array.from(window.document.head.querySelectorAll('style')).some(s => s.textContent?.includes(css.substring(0, 100)) ?? false)) return
 
   const style = window.document.createElement('style')
   style.appendChild(window.document.createTextNode(css))
@@ -460,7 +466,7 @@ function setLocationHash (hash: any) {
   const hashString = '#' + String(hash)
 
   if (history.replaceState) {
-    history.replaceState(null, null, hashString)
+    history.replaceState(null, '', hashString)
   } else {
     location.hash = hashString
   }

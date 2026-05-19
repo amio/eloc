@@ -1,4 +1,4 @@
-import './markdown-deck.ts'
+import './markdown-deck'
 
 import { MarkdownDeck } from './markdown-deck'
 

@@ -11,7 +11,9 @@
     if (ev.ctrlKey || ev.metaKey) {
       if (ev.code === 'KeyS') {
         ev.preventDefault()
-        deck.markdown && save(deck.markdown)
+        if (deck.markdown) {
+          save(deck.markdown)
+        }
       }
     }
   })

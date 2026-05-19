@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { splitMarkdownToPages, getRangeByIndex } from './utils'
 
 const md = `

@@ -23,7 +23,7 @@ const marked = new Marked(
     highlight: (code: string, lang: string) => {
       try {
         return Prism.highlight(code, Prism.languages[lang || 'markup'])
-      } catch (e) {
+      } catch {
         console.warn(`[highlight error] lang:${lang} code:${code}`)
         return code
       }
@@ -37,13 +37,13 @@ const ORIGINAL_HEIGHT = orientPortrait ? 1280 : 800
 
 @customElement('markdown-slide')
 export class MarkdownSlide extends LitElement {
-  _observer: ResizeObserver
+  _observer?: ResizeObserver
 
-  @property({ type: String }) markdown: string
-  @property({ type: Boolean }) invert: boolean
-  @property({ type: String }) css: string
+  @property({ type: String }) markdown = ''
+  @property({ type: Boolean }) invert = false
+  @property({ type: String }) css = ''
 
-  @property({ type: Number }) _scale: number
+  @property({ type: Number }) _scale = 1
 
   static get styles () {
     return slideStyle(themeDefault, themeCodeDefault)
@@ -70,8 +70,10 @@ export class MarkdownSlide extends LitElement {
   }
 
   firstUpdated () {
-    const elem = this.shadowRoot.querySelector('.slide')
-    this._observer = observeResize(elem, this._setScale)
+    const elem = this.shadowRoot?.querySelector('.slide')
+    if (elem) {
+      this._observer = observeResize(elem, this._setScale)
+    }
   }
 
   disconnectedCallback () {
