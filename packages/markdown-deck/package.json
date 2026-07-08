@@ -28,6 +28,6 @@
     "lit": "^3.3.3",
     "sirv-cli": "^3.0.1",
     "ts-jest": "^29.4.9",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }

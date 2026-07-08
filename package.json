@@ -40,7 +40,7 @@
     "mri": "^1.2.0",
     "open": "^11.0.0",
     "sirv": "^3.0.2",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=22"
