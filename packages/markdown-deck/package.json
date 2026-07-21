@@ -17,7 +17,7 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "marked": "^18.0.3",
+    "marked": "^18.0.7",
     "marked-highlight": "^2.2.4",
     "prismjs": "^1.30.0"
   },
