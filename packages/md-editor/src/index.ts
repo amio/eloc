@@ -177,6 +177,25 @@ export class MDHighlightEditor extends HTMLElement {
       this.scheduleUpdate();
     });
 
+    this.editor.addEventListener('paste', (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type.includes('image')) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const dataUrl = reader.result as string;
+              this.insertAtCursor(`![image](${dataUrl})\n`);
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+      }
+    });
+
     // Use initial content as value
     if (this.editor.innerText === '') {
       const rawText = this.getAttribute('value') || this.textContent || '';
@@ -200,6 +219,22 @@ export class MDHighlightEditor extends HTMLElement {
         CSS.highlights.delete(`${this.instanceId}-${type}`);
       }
     }
+  }
+
+  private insertAtCursor(text: string) {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const node = document.createTextNode(text);
+      range.insertNode(node);
+      range.setStartAfter(node);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    this.editor.normalize();
+    this.scheduleUpdate();
   }
 
   attributeChangedCallback(_name: string, _oldValue: string, _newValue: string) {
