@@ -1,4 +1,4 @@
-import { cp, mkdir, writeFile } from 'node:fs/promises'
+import { cp, mkdir, stat, writeFile } from 'node:fs/promises'
 import { join, dirname } from 'node:path'
 import { globby } from 'globby'
 
@@ -18,6 +18,9 @@ export default async function build (markdownFile: string, options: BuildOptions
   const { 'out-dir': out = 'public', title, dark, 'progress-bar': progressBar } = options
   const dest = join(process.cwd(), out)
   const deckAssets = resolveDeckAssets(markdownFile, options)
+  if (!(await stat(deckAssets.markdownPath)).isFile()) {
+    throw new Error(`Expected a Markdown file: ${markdownFile}`)
+  }
 
   await globCopy(deckAssets.assetGlobs, deckAssets.rootDir, dest)
 

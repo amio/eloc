@@ -133,7 +133,7 @@ function getPathname (req: Request): string {
 
 function sendIndex (opts: IndexHTMLOptions): RequestHandler {
   return (req, res) => {
-    const indexHTML = createIndexHTML({ ...opts, edit: true })
+    const indexHTML = createIndexHTML(opts)
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.setHeader('Content-Length', Buffer.byteLength(indexHTML))
 

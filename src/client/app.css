@@ -1,0 +1,64 @@
+:root { font-family: system-ui, sans-serif; color: #222; background: white; color-scheme: light }
+html, body, #app { height: 100%; margin: 0 }
+* { box-sizing: border-box }
+button, textarea { font: inherit }
+button { cursor: pointer }
+#deck { height: 100%; background: white }
+#deck.dark { background: #111; color: #eee; color-scheme: dark }
+.workspace { display: flex; height: 100% }
+.editor-column { width: 34%; min-width: 280px; height: 100% }
+.editor {
+  width: 100%; height: 100%; padding: 20px; border: 0; border-right: 1px solid #ddd;
+  resize: none; outline-offset: -3px; background: #f7f7f7; color: #222;
+  font: 14px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; tab-size: 2;
+}
+.dark .editor { color: #eee; background: #1d1d1d; border-color: #444 }
+.slide-column { flex: 1; min-width: 0; height: 100%; position: relative }
+.slide-host { display: block; height: 100%; width: 100% }
+.toolbar-reveal {
+  position: fixed; z-index: 5; bottom: 0; left: 0; width: 100%; height: 60px;
+  overflow: hidden; outline: none;
+}
+.toolbar {
+  position: absolute; bottom: 0; left: 0; width: 100%;
+  height: 44px; display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 4px 12px; background: #fafafa; border-top: 1px solid #ddd;
+  font-size: 12px; transform: translateY(100%); opacity: 0; pointer-events: none;
+  transition: transform .22s cubic-bezier(.16, 1, .3, 1), opacity .16s ease;
+}
+.toolbar-reveal:hover .toolbar,
+.toolbar-reveal:focus-visible .toolbar,
+.toolbar-reveal:has(:focus-visible) .toolbar { transform: translateY(0); opacity: 1; pointer-events: auto }
+@media (hover: none) {
+  .toolbar-reveal:focus-within .toolbar { transform: translateY(0); opacity: 1; pointer-events: auto }
+}
+.toolbar button { border: 1px solid #ddd; border-radius: 5px; padding: 4px 8px; background: transparent; color: inherit }
+.toolbar kbd { margin-left: 6px; font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; opacity: .55 }
+.toolbar button:hover { background: #e8e8e8 }
+.toolbar button:disabled { opacity: .35; cursor: default }
+.dark .toolbar { background: #171717; border-color: #444 }
+.dark .toolbar button { border-color: #555 }
+.dark .toolbar button:hover { background: #333 }
+.counter { min-width: 48px; text-align: center; font-variant-numeric: tabular-nums }
+.progress-bar { position: absolute; bottom: 0; height: 3px; width: 100%; background: #ddd }
+.progress { height: 100%; background: #222; transition: width .2s ease }
+.dark .progress { background: #eee }
+.toast { position: fixed; z-index: 10; bottom: 56px; left: 16px; right: 16px; width: fit-content; max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 6px; color: white; background: #333; font-size: 14px }
+.toast.error { background: #b3261e }
+.toast.success { background: #197342 }
+.loading { padding: 24px }
+.print-wrap .slide-host { height: 100vh; break-after: page; break-inside: avoid }
+.printing .workspace, .printing .slide-column { height: auto; display: block }
+@media (max-width: 960px) {
+  .editing .editor-column { width: 100%; min-width: 0 }
+  .editing .slide-column { display: none }
+  .toolbar { gap: 4px; padding: 4px }
+  .toolbar button { padding: 5px 6px }
+}
+@media (prefers-reduced-motion: reduce) { .progress, .toolbar { transition: none } }
+@media print {
+  @page { size: landscape; margin: 0 }
+  html, body, #app, #deck, .workspace, .slide-column { height: auto !important; display: block !important }
+  .editor-column, .toolbar-reveal, .progress-bar, .toast { display: none !important }
+  .slide-host, .print-wrap .slide-host { height: 100vh; break-after: page; break-inside: avoid }
+}

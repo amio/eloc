@@ -1,7 +1,4 @@
-import { css } from 'lit'
-
-export default css`
-  .slide {
+.slide {
     --font-family: "Inter", "Roboto", sans-serif;
     --code-font-family: "Roboto Mono", "Fira Code", "PT Mono", Menlo, monospace;
     --quote-font-family: "Merriweather", serif;
@@ -126,4 +123,3 @@ export default css`
     vertical-align: middle;
     transform: scale(2);
   }
-`

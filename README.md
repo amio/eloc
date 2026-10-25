@@ -10,9 +10,11 @@ Eloquence cli. For presenters who (1) focus on writing, (2) present in a concise
 - Live editor
 - Export to html
 - Print view / Mobile view / Dark mode
+- Keyboard, touch, and on-screen presentation controls
+- Editable static demos with Markdown download
 - Customizable with web standard
 
-All of this in a [1MB][packagephobia-href] cli. Check out https://eloc.vercel.app
+A single npm package, with a Solid presentation renderer bundled into the CLI. [Try the live introduction and demo](https://eloc.vercel.app).
 
 ### Presentation in Markdown ABC
 
@@ -28,7 +30,8 @@ Brown fox jumps over the lazy dog.
 
 then `eloc slides.md` gives you the presentation with live editor:
 
-<p align="center"><img src="https://eloc-screenshot.vercel.app" width="100%" /></p>
+Press **Esc** to edit, use the arrow keys to navigate, and press **D** or **P**
+for dark mode and print view.
 
 ## Install
 
@@ -46,7 +49,7 @@ npm install -g eloc
   Usage
 
     $ eloc <markdown-file>        Serve markdown file as presentation
-    $ eloc open <markdown-file>   Open markdown file as presention in browser
+    $ eloc open <markdown-file>   Open markdown file as presentation in browser
     $ eloc build <markdown-file>  Export presentation to directory
 
   Options
@@ -79,7 +82,7 @@ npm install -g eloc
 
 - Use `--css` arg with an external stylesheet, which will be applied on every slide.
 
-- Use inline `<style />` for [per-slide customization](https://eloc.vercel.app/#6):
+- Use inline `<style />` for [per-slide customization](https://eloc.vercel.app/#9):
 
   ```
   _write style tag within markdown_
@@ -93,9 +96,50 @@ npm install -g eloc
 
 - https://math.vercel.app/ is your friend for embedding math equations.
 
-## See Also
+## Develop and build
 
-- [markdown-deck](https://github.com/amio/markdown-deck): a web component for presenters
+The repository is one package. `src/` contains the Node CLI and `src/client/`
+contains the Solid presentation UI. No workspace bootstrap is needed.
+
+```bash
+npm ci
+npm run build
+node dist/index.js deck.md
+
+# Build the CLI from source, then export the root introduction deck.
+npm run build:site
+# Output: public/index.html, public/deck.md, and any included local assets.
+```
+
+The browser bundle is embedded in the CLI and exported HTML. Serving an exported
+directory requires no npm installation, JavaScript CDN, or server-side API. Markdown
+and any local assets must be hosted alongside `index.html`. Author Markdown and
+inline HTML are trusted presentation content.
+
+During local authoring, Esc opens the editor and Cmd/Ctrl+S saves through the
+CLI's authenticated save endpoint. On exported sites, the editor previews changes
+in the current tab and **Download** (or Cmd/Ctrl+S) downloads the Markdown.
+
+`npm run dev` watches both CLI and Solid sources. Restart the CLI after a rebuild
+and refresh the browser to load the new bundle.
+
+```bash
+npx playwright install chromium
+npm test                 # TypeScript, source build, parser tests, browser/CLI tests
+npm run test:e2e          # Requires an existing build and public/ export
+```
+
+Vercel uses the root `vercel.json`: `npm run build:site` builds the CLI and exports
+`deck.md`, then serves `public/` in Vercel deployments. To create a Preview deployment with
+the Vercel CLI:
+
+```bash
+vercel link --project eloc
+vercel deploy
+```
+
+Preview deployments do not replace the production homepage. Promote a preview
+only when a production release is explicitly intended.
 
 ## Prior Art
 

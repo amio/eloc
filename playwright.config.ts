@@ -10,11 +10,12 @@ process.env.no_proxy = [process.env.no_proxy, LOCAL_NO_PROXY].filter(Boolean).jo
 
 export default defineConfig({
   testDir: './tests/e2e',
+  workers: 2,
   use: {
     baseURL: E2E_BASE_URL,
     headless: true,
   },
-  webServer: {
+  webServer: [{
     command: `node dist/index.js tests/e2e/test-deck.md -p ${E2E_PORT}`,
     url: E2E_BASE_URL,
     reuseExistingServer: false,
@@ -25,5 +26,11 @@ export default defineConfig({
     },
     stdout: 'pipe',
     stderr: 'pipe',
-  },
+  }, {
+    command: `node tests/serve-static.mjs ${E2E_PORT + 1}`,
+    url: `http://127.0.0.1:${E2E_PORT + 1}/public/index.html`,
+    reuseExistingServer: false,
+    stdout: 'pipe',
+    stderr: 'pipe',
+  }],
 });

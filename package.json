@@ -1,7 +1,7 @@
 {
   "name": "eloc",
   "version": "1.4.1-alpha.3",
-  "description": "1MB cli for markdown presentation authoring",
+  "description": "Markdown presentations with a live Solid editor and a self-contained CLI",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/amio/eloc.git"
@@ -17,29 +17,32 @@
     "package.json"
   ],
   "scripts": {
-    "bootstrap-deps": "npm run build -w markdown-deck",
-    "test": "npm test -w markdown-deck && npm run build && npm run test:e2e",
-    "dev": "npm run build -- --watch ### NOTE: Use `node dist` to test run cli",
-    "prebuild": "npm run bootstrap-deps && rm -rf dist",
+    "dev": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit",
     "build": "node scripts/build.mjs",
-    "build:site": "npm run build && node dist/index.js build deck.md",
+    "build:site": "npm run build && node dist/index.js build deck.md --title \"eloc \u2014 Markdown presentations\" --progress-bar",
+    "test": "npm run typecheck && npm run build:site && npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test tests/unit/*.test.ts",
     "test:e2e": "playwright test",
     "prepack": "npm run build"
   },
-  "workspaces": [
-    "./packages/*"
-  ],
   "devDependencies": {
+    "@babel/core": "^7.28.0",
     "@playwright/test": "^1.60.0",
     "@types/mri": "^1.1.5",
     "@types/node": "^25.7.0",
+    "@types/prismjs": "^1.26.6",
+    "babel-preset-solid": "^1.9.16",
     "esbuild": "^0.28.0",
     "globby": "^16.2.0",
     "kleur": "^4.1.5",
-    "markdown-deck": "^1.7.4",
+    "marked": "^18.0.3",
+    "marked-highlight": "^2.2.4",
     "mri": "^1.2.0",
     "open": "^11.0.0",
+    "prismjs": "^1.30.0",
     "sirv": "^3.0.2",
+    "solid-js": "^1.9.17",
     "typescript": "^6.0.3"
   },
   "engines": {

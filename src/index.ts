@@ -14,7 +14,7 @@ const help = `
   Usage
 
     $ eloc <markdown-file>        ${dim('Serve markdown file as presentation')}
-    $ eloc open <markdown-file>   ${dim('Open markdown file as presention in browser')}
+    $ eloc open <markdown-file>   ${dim('Open markdown file as presentation in browser')}
     $ eloc build <markdown-file>  ${dim('Export presentation to directory')}
 
   Options

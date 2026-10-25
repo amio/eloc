@@ -1,7 +1,7 @@
 {
   "version": 2,
   "public": true,
-  "alias": "eloc.vercel.app",
+  "installCommand": "npm ci",
   "buildCommand": "npm run build:site",
   "outputDirectory": "public"
 }
