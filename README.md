@@ -117,8 +117,21 @@ and any local assets must be hosted alongside `index.html`. Author Markdown and
 inline HTML are trusted presentation content.
 
 During local authoring, Esc opens the editor and Cmd/Ctrl+S saves through the
-CLI's authenticated save endpoint. On exported sites, the editor previews changes
-in the current tab and **Download** (or Cmd/Ctrl+S) downloads the Markdown.
+CLI's token-protected save endpoint. The local server listens only on
+`127.0.0.1`; unselected hidden files and directories are not served.
+
+On exported sites, the editor previews changes in the current tab and
+**Download** (or Cmd/Ctrl+S) downloads the Markdown. Loading another document with
+`?src=...` also uses downloads, with that document's filename, instead of writing
+to the CLI's source file. If reading the source fails, the editor offers a
+recovery download; reload after the read problem is resolved to resume local
+saves. A source file that the local server confirms does not exist can still be
+created from the editor.
+
+External stylesheets load inside each slide, preserving relative images and CSS
+imports. Their availability after disconnecting, including when switching to print
+view, depends on the host's HTTP cache policy; external assets are not bundled into
+an offline resource cache.
 
 `npm run dev` watches both CLI and Solid sources. Restart the CLI after a rebuild
 and refresh the browser to load the new bundle.

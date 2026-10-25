@@ -17,8 +17,8 @@ introduction and demo. This migration must not replace the production homepage.
 
 - Existing Node CLI modules own argument parsing, the HTTP server, authenticated
   writes, asset resolution, and static export.
-- `src/client/` owns Solid state and UI. One deck component owns Markdown, active
-  slide, editor, and view modes. Slide components own isolated styles and resize
+- `src/client/` owns Solid state and UI. App coordinates the active slide, editor,
+  and view modes. Slide components own isolated styles and resize
   observers; inline styles must not leak between slides or into the editor.
 - A shared slide parser supplies source ranges for splitting, editor selection,
   and caret navigation. Fenced code does not create slide boundaries.
@@ -26,6 +26,19 @@ introduction and demo. This migration must not replace the production homepage.
   contains that bundle and escaped JSON configuration, without CDN dependencies.
 - Local pages save through the existing token-protected API. Exported pages offer
   the same editable demo and download Markdown instead of calling a local API.
+- `src/client/document.ts` owns document identity, Markdown, loading outcome, and
+  persistence. A URL source override only retains local-save capability when it
+  resolves to the configured source. Failed reads permit recovery downloads;
+  creating a new local document requires an explicit missing-source response.
+- `deck-assets` distinguishes required literal files, include globs, and encoded
+  browser references. External stylesheets are linked inside each slide's shadow
+  root so relative images and imports retain the stylesheet's base URL. Native
+  stylesheet loading avoids CSS rewriting; offline availability across view
+  remounts follows the host's HTTP cache policy rather than an owned resource cache.
+- The authoring server binds to IPv4 loopback. Explicit Markdown/CSS inputs are
+  served as literal files; other hidden paths are rejected before static serving.
+  Global deck shortcuts inspect the composed event path to respect interactive
+  author content inside shadow roots.
 - `npm run build:site` builds the CLI, then uses that CLI to export `deck.md`.
   Vercel's output directory remains `public`.
 

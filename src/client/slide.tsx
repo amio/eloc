@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onCleanup, onMount } from 'solid-js'
+import { createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js'
 import { render } from 'solid-js/web'
 import { renderMarkdown } from './markdown'
 import slideCSS from './slide.css?raw'
@@ -7,7 +7,8 @@ import codeCSS from './code.css?raw'
 
 interface SlideProps {
   markdown: string
-  css: string
+  css?: string
+  onCssError: () => void
   dark: boolean
   index: number
 }
@@ -25,7 +26,7 @@ export function Slide(props: SlideProps) {
     // Each slide owns a shadow root so author CSS remains local in print view too.
     const dispose = render(() => <>
       <style>{slideCSS + themeCSS + codeCSS}</style>
-      <style>{props.css}</style>
+      <Show when={props.css}><link rel="stylesheet" href={props.css} onError={props.onCssError} /></Show>
       <div class="slide" classList={{ invert: props.dark }}>
         <section class="content" style={{
           width: `${width()}px`, height: `${height()}px`,

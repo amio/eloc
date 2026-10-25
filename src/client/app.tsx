@@ -1,18 +1,17 @@
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from 'solid-js'
 import type { DeckConfig } from './config'
+import { createDocument } from './document'
 import { pageAtOffset, parsePages } from './pages'
 import { Slide } from './slide'
 
 export function App(props: { config: DeckConfig }) {
   const config = props.config
-  const [markdown, setMarkdown] = createSignal('')
-  const [stylesheet, setStylesheet] = createSignal('')
-  const [loaded, setLoaded] = createSignal(false)
+  const deckDocument = createDocument(config)
+  const { markdown, setMarkdown, loaded, saving } = deckDocument
   const [requestedIndex, setRequestedIndex] = createSignal(readHash())
   const [view, setView] = createSignal<'present' | 'edit' | 'print'>('present')
   const [nativePrint, setNativePrint] = createSignal(false)
   const [dark, setDark] = createSignal(Boolean(config.dark))
-  const [saving, setSaving] = createSignal(false)
   const [notice, setNotice] = createSignal<{ text: string; type: string }>()
   const pages = createMemo(() => parsePages(markdown()))
   const index = createMemo(() => Math.max(0, Math.min(requestedIndex(), pages().length - 1)))
@@ -49,31 +48,11 @@ export function App(props: { config: DeckConfig }) {
   }
 
   async function save() {
-    if (!loaded() || saving()) return
-    if (!config.saveToken) {
-      const url = URL.createObjectURL(new Blob([markdown()], { type: 'text/markdown;charset=utf-8' }))
-      const link = document.createElement('a')
-      link.href = url
-      link.download = config.filename
-      link.click()
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-      toast(`Downloaded ${config.filename}`, 'success')
-      return
-    }
-    setSaving(true)
     try {
-      const response = await fetch('/api/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Eloc-Save-Token': config.saveToken },
-        body: JSON.stringify({ markdown: markdown() })
-      })
-      const message = await response.text()
-      if (!response.ok) throw new Error(message)
-      toast(message, 'success')
+      const message = await deckDocument.save()
+      if (message) toast(message, 'success')
     } catch (error) {
       toast(error instanceof Error ? error.message : 'Unable to save Markdown', 'error')
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -90,7 +69,7 @@ export function App(props: { config: DeckConfig }) {
       toggleEditor()
       return
     }
-    if ((event.target as HTMLElement)?.closest('textarea, input, select, button, a, [contenteditable]')) return
+    if (event.composedPath().some(target => target instanceof Element && target.matches('textarea, input, select, button, a, [contenteditable]'))) return
     switch (event.code) {
       case 'Space': case 'ArrowRight': case 'KeyL': navigate(index() + (event.shiftKey ? -1 : 1)); break
       case 'ArrowLeft': case 'KeyJ': navigate(index() + (event.shiftKey ? 1 : -1)); break
@@ -124,17 +103,8 @@ export function App(props: { config: DeckConfig }) {
 
   onMount(() => {
     const controller = new AbortController()
-    const source = new URL(location.href).searchParams.get('src') || config.filename
-    const fetchText = async (url: string) => {
-      const response = await fetch(url, { signal: controller.signal })
-      if (!response.ok) throw new Error(`Unable to load ${url} (${response.status})`)
-      return response.text()
-    }
-    void fetchText(source).then(setMarkdown).catch(error => {
-      if (error.name !== 'AbortError') toast(`${error.message}. Press Esc to start writing.`, 'error')
-    }).finally(() => { if (!controller.signal.aborted) setLoaded(true) })
-    if (config.css) void fetchText(config.css).then(setStylesheet).catch(error => {
-      if (error.name !== 'AbortError') toast(error.message, 'error')
+    void deckDocument.load(controller.signal).catch(error => {
+      toast(`${error.message}. Press Esc to write and download a recovery copy.`, 'error')
     })
     const hashChange = () => {
       setRequestedIndex(readHash())
@@ -170,10 +140,10 @@ export function App(props: { config: DeckConfig }) {
         <div class="slide-column" onTouchStart={touchStart} onTouchEnd={touchEnd} onTouchCancel={() => { touch = undefined }}>
           <Show when={printing()} fallback={
             <Slide markdown={markdown() === '' ? 'Press <kbd>Esc</kbd> to start writing' : pages()[index()].markdown}
-              css={stylesheet()} dark={dark()} index={index()} />
+              css={config.css} onCssError={() => toast(`Unable to load ${config.css}`, 'error')} dark={dark()} index={index()} />
           }>
             <div class="print-wrap"><For each={pages()}>{(page, position) =>
-              <Slide markdown={page.markdown} css={stylesheet()} dark={dark()} index={position()} />
+              <Slide markdown={page.markdown} css={config.css} onCssError={() => toast(`Unable to load ${config.css}`, 'error')} dark={dark()} index={position()} />
             }</For></div>
           </Show>
           <Show when={config.progressBar && !printing()}>
@@ -197,7 +167,7 @@ export function App(props: { config: DeckConfig }) {
           <button aria-pressed={view() === 'print'} aria-keyshortcuts="P" title="Toggle print view (P)" onClick={() => setView(view() === 'print' ? 'present' : 'print')}>Print<kbd aria-hidden="true">P</kbd></button>
           <Show when={view() === 'edit'}>
             <button disabled={saving()} title="Save Markdown (⌘S / Ctrl+S)" onClick={() => { void save() }}>
-              {config.saveToken ? saving() ? 'Saving…' : 'Save' : 'Download'}
+              {deckDocument.canWrite() ? saving() ? 'Saving…' : 'Save' : 'Download'}
             </button>
           </Show>
         </nav>

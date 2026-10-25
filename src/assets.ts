@@ -4,8 +4,8 @@ import type { DeckConfig } from './client/config'
 
 export type IndexHTMLOptions = DeckConfig
 
-export function createIndexHTML({ filename, title, css, dark, progressBar, saveToken }: IndexHTMLOptions) {
-  const config: DeckConfig = { filename, title, css, dark, progressBar, saveToken }
+export function createIndexHTML({ filename, source, title, css, dark, progressBar, saveToken }: IndexHTMLOptions) {
+  const config: DeckConfig = { filename, source, title, css, dark, progressBar, saveToken }
   return `<!DOCTYPE html>
 <html lang="en">
   <head>

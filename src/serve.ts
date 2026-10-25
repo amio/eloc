@@ -1,5 +1,5 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto'
-import { writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { createServer as createHttpServer, IncomingMessage, ServerResponse } from 'node:http'
 import { createServer as createNetServer } from 'node:net'
 import { resolve } from 'node:path'
@@ -28,6 +28,7 @@ interface ServeOptions {
 }
 
 const SAVE_TOKEN_HEADER = 'x-eloc-save-token'
+const HOST = '127.0.0.1'
 const MIN_PORT = 1
 const MAX_PORT = 65535
 const { PORT = '5000' } = process.env
@@ -51,6 +52,7 @@ export default async function elocServe (markdownFile: string, options: ServeOpt
       markdownFile,
       indexOptions: {
         filename: deckAssets.filename,
+        source: deckAssets.source,
         title,
         css: deckAssets.css,
         dark,
@@ -72,9 +74,9 @@ export default async function elocServe (markdownFile: string, options: ServeOpt
 
     const initialPort = resolveInitialPort(options.port, PORT)
     const port = await findAvailablePort(initialPort)
-    const url = `http://localhost:${port}`
+    const url = `http://${HOST}:${port}`
 
-    server.listen(port, () => {
+    server.listen(port, HOST, () => {
       console.info(`\n  Presenting at ${bold(url)}\n`)
 
       verboseLog(`SHORTCUTS`)
@@ -107,9 +109,15 @@ function createRequestHandler ({
   const sendIndexPage = sendIndex(indexOptions)
   const saveMarkdown = handleSave(deckAssets.markdownPath, deckAssets.rootDir, markdownFile, verboseLog, saveToken)
   const serveStatic = serveDir(deckAssets.rootDir)
+  const requiredFiles = new Set(deckAssets.requiredFiles.map(file => `/${file}`))
 
   return async (req, res) => {
-    const pathname = getPathname(req)
+    let pathname: string
+    try {
+      pathname = getPathname(req)
+    } catch {
+      return sendPlainText(res, 400, 'Invalid request path')
+    }
 
     if ((req.method === 'GET' || req.method === 'HEAD') && pathname === '/') {
       return sendIndexPage(req, res)
@@ -120,6 +128,26 @@ function createRequestHandler ({
     }
 
     if (req.method === 'GET' || req.method === 'HEAD') {
+      // Explicit inputs are literal files, including names with URL delimiters.
+      // Only a confirmed missing source grants permission to create a new deck.
+      if (requiredFiles.has(pathname)) {
+        const isDocument = pathname === `/${deckAssets.filename}`
+        try {
+          const content = await readFile(resolve(deckAssets.rootDir, pathname.slice(1)))
+          res.setHeader('Content-Type', isDocument ? 'text/plain; charset=utf-8' : 'text/css; charset=utf-8')
+          res.setHeader('Cache-Control', 'no-cache')
+          res.setHeader('Content-Length', content.byteLength)
+          res.end(req.method === 'HEAD' ? undefined : content)
+        } catch (error: any) {
+          if (error.code !== 'ENOENT') throw error
+          if (isDocument) res.setHeader('X-Eloc-New-Document', 'true')
+          sendPlainText(res, 404, 'Not Found')
+        }
+        return
+      }
+      if (pathname.split(/[\\/]/).some(part => part.startsWith('.'))) {
+        return sendPlainText(res, 404, 'Not Found')
+      }
       return serveStatic(req, res)
     }
 
@@ -128,7 +156,7 @@ function createRequestHandler ({
 }
 
 function getPathname (req: Request): string {
-  return new URL(req.url || '/', 'http://localhost').pathname
+  return decodeURIComponent(new URL(req.url || '/', 'http://localhost').pathname)
 }
 
 function sendIndex (opts: IndexHTMLOptions): RequestHandler {
@@ -282,6 +310,6 @@ function checkPort(port: number): Promise<boolean> {
 
     tester.once('error', unavailable)
     tester.once('listening', available)
-    tester.listen(port)
+    tester.listen(port, HOST)
   })
 }

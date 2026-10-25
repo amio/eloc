@@ -1,4 +1,4 @@
-import { isAbsolute, relative, resolve, dirname, basename, sep } from 'node:path'
+import { isAbsolute, relative, resolve, dirname, basename, sep, posix } from 'node:path'
 
 export interface DeckAssetOptions {
   include?: string | string[];
@@ -9,7 +9,9 @@ export interface ResolvedDeckAssets {
   markdownPath: string;
   rootDir: string;
   filename: string;
+  source: string;
   css?: string;
+  requiredFiles: string[];
   assetGlobs: string[];
 }
 
@@ -24,17 +26,17 @@ export function resolveDeckAssets (markdownFile: string, options: DeckAssetOptio
   const css = normalizeCssReference(options.css, rootDir, markdownDirFromCwd)
   const includes = normalizeGlobList(options.include, rootDir, markdownDirFromCwd)
   const assetGlobs = unique([
-    filename,
     ...IMAGE_GLOBS,
-    ...includes,
-    css?.localPattern
-  ].filter(isString))
+    ...includes
+  ])
 
   return {
     markdownPath,
     rootDir,
     filename,
+    source: browserPath(filename),
     css: css?.reference,
+    requiredFiles: unique([filename, css?.localPath].filter(isString)),
     assetGlobs
   }
 }
@@ -55,31 +57,36 @@ function normalizeCssReference (css: string | string[] | undefined, rootDir: str
     return { reference: cssValue }
   }
 
-  const reference = normalizeLocalPattern(cssValue, rootDir, markdownDirFromCwd)
-  return { reference, localPattern: reference }
+  const localPath = normalizeLocalPath(cssValue, rootDir, markdownDirFromCwd)
+  return { reference: browserPath(localPath), localPath }
 }
 
 function normalizeGlobList (value: string | string[] | undefined, rootDir: string, markdownDirFromCwd: string): string[] {
-  return toArray(value).map(item => normalizeLocalPattern(item, rootDir, markdownDirFromCwd))
+  return toArray(value).map(item => {
+    const negated = item.startsWith('!')
+    const path = normalizeLocalPath(negated ? item.slice(1) : item, rootDir, markdownDirFromCwd)
+    return negated ? `!${path}` : path
+  })
 }
 
-function normalizeLocalPattern (pattern: string, rootDir: string, markdownDirFromCwd: string): string {
-  const negated = pattern.startsWith('!')
-  const patternBody = negated ? pattern.slice(1) : pattern
-
-  if (isExternalReference(patternBody)) {
+function normalizeLocalPath (pattern: string, rootDir: string, markdownDirFromCwd: string): string {
+  if (isExternalReference(pattern)) {
     throw new Error(`External URL is not supported as a local asset pattern: ${pattern}`)
   }
 
-  if (isAbsolute(patternBody)) {
-    const relativePattern = normalizePath(relative(rootDir, patternBody))
+  if (isAbsolute(pattern)) {
+    const relativePattern = normalizePath(relative(rootDir, pattern))
     assertRelativePatternInsideRoot(relativePattern, pattern, rootDir)
-    return negated ? `!${relativePattern}` : relativePattern
+    return relativePattern
   }
 
-  const strippedPattern = stripMarkdownDirPrefix(normalizePath(patternBody), markdownDirFromCwd)
+  const strippedPattern = stripMarkdownDirPrefix(normalizePath(pattern), markdownDirFromCwd)
   assertRelativePatternInsideRoot(strippedPattern, pattern, rootDir)
-  return negated ? `!${strippedPattern}` : strippedPattern
+  return posix.normalize(strippedPattern)
+}
+
+function browserPath (path: string): string {
+  return `./${path.split('/').map(encodeURIComponent).join('/')}`
 }
 
 function assertRelativePatternInsideRoot (relativePattern: string, originalPattern: string, rootDir: string) {
