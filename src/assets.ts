@@ -1,10 +1,13 @@
-import clientSource from '../dist/client.js?raw'
-import appCSS from './client/app.css?raw'
 import type { DeckConfig } from './client/config'
 
 export type IndexHTMLOptions = DeckConfig
 
-export function createIndexHTML({ filename, source, title, css, dark, progressBar, saveToken }: IndexHTMLOptions) {
+export interface PresentationAssets {
+  clientSource: string
+  appCSS: string
+}
+
+export function createIndexHTML({ filename, source, title, css, dark, progressBar, saveToken }: IndexHTMLOptions, { clientSource, appCSS }: PresentationAssets) {
   const config: DeckConfig = { filename, source, title, css, dark, progressBar, saveToken }
   return `<!DOCTYPE html>
 <html lang="en">

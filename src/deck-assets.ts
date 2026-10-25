@@ -17,8 +17,8 @@ export interface ResolvedDeckAssets {
 
 const IMAGE_GLOBS = ['*.png', '*.svg', '*.gif', '*.jpg']
 
-export function resolveDeckAssets (markdownFile: string, options: DeckAssetOptions = {}): ResolvedDeckAssets {
-  const markdownPath = resolve(process.cwd(), markdownFile)
+export function resolveDeckAssets (markdownFile: string, options: DeckAssetOptions = {}, cwd = process.cwd()): ResolvedDeckAssets {
+  const markdownPath = resolve(cwd, markdownFile)
   const rootDir = dirname(markdownPath)
   const filename = basename(markdownPath)
   const markdownDirFromCwd = normalizePath(dirname(markdownFile))

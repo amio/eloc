@@ -138,9 +138,34 @@ and refresh the browser to load the new bundle.
 
 ```bash
 npx playwright install chromium
-npm test                 # TypeScript, source build, parser tests, browser/CLI tests
+npm test                 # TypeScript, source build, core tests, browser/CLI tests
+npm run test:unit         # Core tests; no bundle or browser required
+npm run test:coverage     # Core source coverage using Node V8
 npm run test:e2e          # Requires an existing build and public/ export
 ```
+
+The CLI entry point only parses arguments, dispatches commands, and reports errors.
+Core functions accept an explicit working directory or browser resources where
+needed, so tests can import source modules without building the CLI or changing
+process-wide state.
+
+| Core behavior | Direct tests |
+| --- | --- |
+| Command parsing | Serve/open/build, help/version, aliases, repeated flags, `--` separator |
+| Deck assets | Root resolution, local/external CSS, glob exclusions, literal filenames, traversal rejection |
+| HTML generation | Embedded resources, configuration, title and script escaping |
+| Export | Real temporary-directory copies, defaults, nested assets, absolute paths, filesystem failures |
+| HTTP server | GET/HEAD, static assets, hidden paths, missing-source detection, token isolation, save validation and persistence |
+| Port selection | Defaults/environment precedence, invalid values, occupied-port retry and exhaustion |
+| Streamed save bodies | Chunked UTF-8, byte limits, malformed JSON and interrupted streams |
+
+Filesystem and HTTP tests use temporary directories and loopback servers; they
+run under the Node test runner alongside pure unit tests. Playwright separately
+verifies the packaged CLI and the complete browser editing/export journeys.
+The coverage report measures imported core source; it does not measure browser
+UI coverage or prove behavior on every operating system. The system
+browser opener is injected in adapter tests; tests do not launch a real browser
+application through the operating system.
 
 Vercel uses the root `vercel.json`: `npm run build:site` builds the CLI and exports
 `deck.md`, then serves `public/` in Vercel deployments. To create a Preview deployment with
