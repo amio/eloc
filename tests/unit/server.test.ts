@@ -77,6 +77,23 @@ test('denies hidden paths and malformed URLs while retaining explicit hidden inp
   }
 })
 
+test('serves an embed entry without source identity or local-save credentials', async t => {
+  const app = await start(t)
+  const get = await fetch(`${app.url}/embed.html?mode=standalone&saveToken=attacker`)
+  assert.equal(get.status, 200)
+  const html = await get.text()
+  const config = readConfig(html)
+  assert.equal(config.mode, 'embed')
+  assert.equal(config.source, '')
+  assert.equal(config.saveToken, undefined)
+  assert.equal(html.includes(app.config.saveToken), false)
+  const head = await fetch(`${app.url}/embed.html`, { method: 'HEAD' })
+  assert.equal(head.status, 200)
+  assert.equal(head.headers.get('content-length'), String(Buffer.byteLength(html)))
+  assert.equal(await head.text(), '')
+  assert.equal((await fetch(`${app.url}/embed.html`, { method: 'POST' })).status, 404)
+})
+
 test('marks only a confirmed missing source as a new document', async t => {
   const app = await start(t, 'new.md', { css: 'missing.css' })
   for (const method of ['GET', 'HEAD']) {
@@ -92,6 +109,14 @@ test('marks only a confirmed missing source as a new document', async t => {
   assert.equal(failed.status, 500)
   assert.equal(failed.headers.get('x-eloc-new-document'), null)
   assert.equal(app.errors.length, 1)
+})
+
+test('an explicit source keeps ownership of its path when named embed.html', async t => {
+  const app = await start(t, 'embed.html')
+  await app.write('embed.html', '# Explicit Markdown input')
+  const response = await fetch(`${app.url}/embed.html`)
+  assert.ok(response.headers.get('content-type')?.startsWith('text/plain'))
+  assert.equal(await response.text(), '# Explicit Markdown input')
 })
 
 test('creates, overwrites, and empties only the selected source using its token', async t => {

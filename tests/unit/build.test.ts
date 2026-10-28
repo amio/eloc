@@ -22,6 +22,10 @@ test('exports Markdown, default images, nested includes, and the last CSS with c
   for (const file of ['assets/private.txt', 'unused.css']) await assert.rejects(access(join(root, 'output', file)))
   const config = readConfig(await readFile(join(root, 'output/index.html'), 'utf8'))
   assert.deepEqual(config, { filename: 'deck.md', source: './deck.md', title: 'My Deck', css: './styles/theme.css', dark: true, progressBar: true })
+  const embedConfig = readConfig(await readFile(join(root, 'output/embed.html'), 'utf8'))
+  assert.equal(embedConfig.mode, 'embed')
+  assert.equal(embedConfig.source, '')
+  assert.equal(embedConfig.saveToken, undefined)
   assert.equal(await readFile(join(root, 'slides/deck.md'), 'utf8'), '# Export')
 })
 
@@ -57,6 +61,16 @@ test('propagates output filesystem errors to the caller', async t => {
   await write('deck.md', '# Deck')
   await write('output', 'a file blocking the output directory')
   await assert.rejects(build('deck.md', { 'out-dir': 'output' }, assets, root), /EEXIST|ENOTDIR/)
+})
+
+test('rejects collisions with the embed entry before overwriting included content', async t => {
+  const { root, write } = await workspace(t)
+  await write('deck.md', '# Deck')
+  await write('embed.html', '# Existing content')
+  for (const [filename, options] of [['deck.md', { include: 'embed.html' }], ['embed.html', {}]] as const) {
+    await assert.rejects(build(filename, { ...options, 'out-dir': root }, assets, root), /filename is reserved/)
+    assert.equal(await readFile(join(root, 'embed.html'), 'utf8'), '# Existing content')
+  }
 })
 
 test('finishes all pending copies before rejecting an export with missing CSS', async t => {

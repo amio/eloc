@@ -34,6 +34,7 @@
     "@types/node": "^25.7.0",
     "@types/prismjs": "^1.26.6",
     "babel-preset-solid": "^1.9.16",
+    "dompurify": "^3.4.17",
     "esbuild": "^0.28.0",
     "globby": "^16.2.0",
     "kleur": "^4.1.5",

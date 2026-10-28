@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { createIndexHTML } from '../../src/assets.ts'
+import { createHash } from 'node:crypto'
+import { createEmbedHTML, createIndexHTML } from '../../src/assets.ts'
 
 import { assets, readConfig } from './helpers.ts'
 
@@ -19,4 +20,17 @@ test('serializes configuration and escapes HTML/script delimiters without changi
   assert.deepEqual(readConfig(html), config)
   assert.ok(html.includes('console.log("<\\/script>")'))
   assert.equal((html.match(/<\/script>/g) || []).length, 2)
+})
+
+test('embed HTML never includes write credentials and allows only its bundled script', () => {
+  const html = createIndexHTML({ filename: 'deck.md', source: './deck.md', saveToken: 'private-token', mode: 'embed' }, assets)
+  assert.equal(readConfig(html).mode, 'embed')
+  assert.equal(readConfig(html).saveToken, undefined)
+  assert.equal(html.includes('private-token'), false)
+  const hash = createHash('sha256').update(assets.clientSource).digest('base64')
+  assert.ok(html.includes(`script-src 'sha256-${hash}'`))
+  const generic = readConfig(createEmbedHTML(assets))
+  assert.equal(generic.source, '')
+  assert.equal(generic.mode, 'embed')
+  assert.equal(generic.saveToken, undefined)
 })

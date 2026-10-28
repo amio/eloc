@@ -52,6 +52,9 @@ button { cursor: pointer }
 @media (max-width: 960px) {
   .editing .editor-column { width: 100%; min-width: 0 }
   .editing .slide-column { display: none }
+  .embedded.editing .workspace { flex-direction: column }
+  .embedded.editing .editor-column { height: 45%; flex: 0 0 45% }
+  .embedded.editing .slide-column { display: block; min-height: 0 }
   .toolbar { gap: 4px; padding: 4px }
   .toolbar button { padding: 5px 6px }
 }

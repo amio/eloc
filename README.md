@@ -12,6 +12,7 @@ Eloquence cli. For presenters who (1) focus on writing, (2) present in a concise
 - Print view / Mobile view / Dark mode
 - Keyboard, touch, and on-screen presentation controls
 - Editable static demos with Markdown download
+- Embeddable editor and live slide preview
 - Customizable with web standard
 
 A single npm package, with a Solid presentation renderer bundled into the CLI. [Try the live introduction and demo](https://eloc.vercel.app).
@@ -96,6 +97,53 @@ npm install -g eloc
 
 - https://math.vercel.app/ is your friend for embedding math equations.
 
+## Embedding
+
+The local CLI serves `/embed.html`, and `eloc build` includes `embed.html` in the
+exported directory. Host the export and embed it in another page:
+
+```html
+<iframe
+  src="https://slides.example/embed.html?src=./deck.md&amp;view=edit"
+  title="Editable presentation"
+  loading="lazy"
+  style="display:block;width:100%;height:480px;border:0"
+></iframe>
+```
+
+| Query parameter | Values | Default |
+| --- | --- | --- |
+| `src` | Markdown URL, required | None |
+| `view` | `edit` or `present` | `edit` |
+| `theme` | `light` or `dark` | `light` |
+
+Relative `src` values resolve against `embed.html`. For sources with their own
+query parameters, construct the embed URL with `URLSearchParams`. A different
+source origin must allow browser fetching from the embed origin through CORS;
+self-hosting the player alongside the Markdown avoids that cross-origin request.
+Relative images and inline CSS resources resolve beside the final Markdown URL,
+including after redirects.
+
+The editor and preview share the frame: columns in wide frames, stacked in narrow
+ones. Embeds do not take focus when mounted. Each frame has its own editing state,
+navigation, styles, and shortcuts. Edits stay in memory; the embed provides no
+Save or Download action and never calls the CLI save endpoint.
+
+Embedded HTML is sanitized with DOMPurify, and a content policy permits only the
+bundled player script. Slide-scoped `<style>` elements remain supported; scripts,
+event handlers, forms, nested frames, and author `<base>` elements are removed.
+Standalone CLI/export pages retain their trusted-author HTML behavior.
+
+The shared Deck emits a save request containing `{ source, markdown }` when its
+environment supplies an `onSave` handler. Standalone pages bind that request to
+CLI writes or Markdown downloads; `embed.html` supplies no persistence handler.
+The browser module, Web Component, framework adapters, declarative loader, and
+oEmbed interfaces remain future integration options rather than published APIs.
+
+`embed.html` is reserved in static exports; exporting a source or included asset
+with that root filename fails rather than overwriting it. In the local server,
+an explicitly selected input at that path still takes precedence over the player.
+
 ## Develop and build
 
 The repository is one package. `src/` contains the Node CLI and `src/client/`
@@ -108,13 +156,13 @@ node dist/index.js deck.md
 
 # Build the CLI from source, then export the root introduction deck.
 npm run build:site
-# Output: public/index.html, public/deck.md, and any included local assets.
+# Output: public/index.html, public/embed.html, public/deck.md, and included assets.
 ```
 
 The browser bundle is embedded in the CLI and exported HTML. Serving an exported
 directory requires no npm installation, JavaScript CDN, or server-side API. Markdown
-and any local assets must be hosted alongside `index.html`. Author Markdown and
-inline HTML are trusted presentation content.
+and any local assets must be hosted alongside `index.html`. Standalone author
+Markdown and inline HTML are trusted presentation content.
 
 During local authoring, Esc opens the editor and Cmd/Ctrl+S saves through the
 CLI's token-protected save endpoint. The local server listens only on

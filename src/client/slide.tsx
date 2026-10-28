@@ -11,6 +11,7 @@ interface SlideProps {
   onCssError: () => void
   dark: boolean
   index: number
+  trusted?: boolean
 }
 
 export function Slide(props: SlideProps) {
@@ -20,7 +21,7 @@ export function Slide(props: SlideProps) {
   const width = () => portrait() ? 800 : 1280
   const height = () => portrait() ? 1280 : 800
   const scale = () => Math.min(size().width / width(), size().height / height()) * 0.9
-  const markup = createMemo(() => renderMarkdown(props.markdown))
+  const markup = createMemo(() => renderMarkdown(props.markdown, props.trusted))
 
   onMount(() => {
     // Each slide owns a shadow root so author CSS remains local in print view too.

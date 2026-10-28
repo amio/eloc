@@ -2,7 +2,7 @@ import { cp, mkdir, stat, writeFile } from 'node:fs/promises'
 import { join, dirname, resolve } from 'node:path'
 import { globby } from 'globby'
 
-import { createIndexHTML, type PresentationAssets } from './assets.ts'
+import { createEmbedHTML, createIndexHTML, type PresentationAssets } from './assets.ts'
 import { resolveDeckAssets, type DeckAssetOptions } from './deck-assets.ts'
 
 export interface BuildOptions extends DeckAssetOptions {
@@ -21,7 +21,9 @@ export default async function build (markdownFile: string, options: BuildOptions
   }
 
   const matchedFiles = await globby(deckAssets.assetGlobs, { cwd: deckAssets.rootDir })
-  await copyFiles([...new Set([...deckAssets.requiredFiles, ...matchedFiles])], deckAssets.rootDir, dest)
+  const files = [...new Set([...deckAssets.requiredFiles, ...matchedFiles])]
+  if (files.some(file => file.toLowerCase() === 'embed.html')) throw new Error('Cannot export "embed.html": this filename is reserved for the embedded player')
+  await copyFiles(files, deckAssets.rootDir, dest)
 
   const indexHTML = createIndexHTML({
     filename: deckAssets.filename,
@@ -32,6 +34,7 @@ export default async function build (markdownFile: string, options: BuildOptions
     progressBar
   }, assets)
   await outputFile(join(dest, 'index.html'), indexHTML)
+  await outputFile(join(dest, 'embed.html'), createEmbedHTML(assets))
 }
 
 async function copyFiles (files: string[], source: string, dest: string) {

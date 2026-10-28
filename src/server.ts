@@ -4,7 +4,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { resolve } from 'node:path'
 import sirv from 'sirv'
 
-import { createIndexHTML, type IndexHTMLOptions, type PresentationAssets } from './assets.ts'
+import { createEmbedHTML, createIndexHTML, type IndexHTMLOptions, type PresentationAssets } from './assets.ts'
 import { assertPathInsideRoot, resolveDeckAssets, type DeckAssetOptions, type ResolvedDeckAssets } from './deck-assets.ts'
 
 type Request = IncomingMessage
@@ -72,7 +72,6 @@ function createRequestHandler ({
   onError: (error: Error) => void;
   assets: PresentationAssets;
 }): RequestHandler {
-  const sendIndexPage = sendIndex(indexOptions, assets)
   const saveMarkdown = handleSave(deckAssets.markdownPath, deckAssets.rootDir, onSave, onError, saveToken)
   const serveStatic = serveDir(deckAssets.rootDir)
   const requiredFiles = new Set(deckAssets.requiredFiles.map(file => `/${file}`))
@@ -86,7 +85,7 @@ function createRequestHandler ({
     }
 
     if ((req.method === 'GET' || req.method === 'HEAD') && pathname === '/') {
-      return sendIndexPage(req, res)
+      return sendHTML(createIndexHTML(indexOptions, assets), req, res)
     }
 
     if (req.method === 'POST' && pathname === '/api/save') {
@@ -111,6 +110,7 @@ function createRequestHandler ({
         }
         return
       }
+      if (pathname === '/embed.html') return sendHTML(createEmbedHTML(assets), req, res)
       if (pathname.split(/[\\/]/).some(part => part.startsWith('.'))) {
         return sendPlainText(res, 404, 'Not Found')
       }
@@ -125,18 +125,10 @@ function getPathname (req: Request): string {
   return decodeURIComponent(new URL(req.url || '/', 'http://localhost').pathname)
 }
 
-function sendIndex (opts: IndexHTMLOptions, assets: PresentationAssets): RequestHandler {
-  return (req, res) => {
-    const indexHTML = createIndexHTML(opts, assets)
-    res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    res.setHeader('Content-Length', Buffer.byteLength(indexHTML))
-
-    if (req.method === 'HEAD') {
-      res.end()
-    } else {
-      res.end(indexHTML)
-    }
-  }
+function sendHTML (html: string, req: Request, res: Response) {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8')
+  res.setHeader('Content-Length', Buffer.byteLength(html))
+  res.end(req.method === 'HEAD' ? undefined : html)
 }
 
 function serveDir (dir: string): RequestHandler {

@@ -6,4 +6,5 @@ export interface DeckConfig {
   dark?: boolean
   progressBar?: boolean
   saveToken?: string
+  mode?: 'embed'
 }
