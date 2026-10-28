@@ -14,6 +14,7 @@ export default defineConfig({
   use: {
     baseURL: E2E_BASE_URL,
     headless: true,
+    channel: process.env.ELOC_E2E_CHANNEL,
   },
   webServer: [{
     command: `node dist/index.js tests/e2e/test-deck.md -p ${E2E_PORT}`,

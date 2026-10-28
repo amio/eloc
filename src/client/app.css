@@ -8,11 +8,28 @@ button { cursor: pointer }
 .workspace { display: flex; height: 100% }
 .editor-column { width: 34%; min-width: 280px; height: 100% }
 .editor {
+  --ink-heading: #8250df; --ink-strong: #0550ae; --ink-emphasis: #953800;
+  --ink-strike: #cf222e; --ink-code: #116329; --ink-code-bg: #e6eee6;
+  --ink-link: #0969da; --ink-muted: #6e7781;
   width: 100%; height: 100%; padding: 20px; border: 0; border-right: 1px solid #ddd;
   resize: none; outline-offset: -3px; background: #f7f7f7; color: #222;
   font: 14px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; tab-size: 2;
 }
-.dark .editor { color: #eee; background: #1d1d1d; border-color: #444 }
+.dark .editor {
+  --ink-heading: #d2a8ff; --ink-strong: #79c0ff; --ink-emphasis: #ffa657;
+  --ink-strike: #ff7b72; --ink-code: #a5d6ff; --ink-code-bg: #2d333b;
+  --ink-link: #79c0ff; --ink-muted: #9da7b1;
+  color: #eee; background: #1d1d1d; border-color: #444;
+}
+.editor::highlight(md-ink-heading) { color: var(--ink-heading) }
+.editor::highlight(md-ink-strong) { color: var(--ink-strong) }
+.editor::highlight(md-ink-emphasis) { color: var(--ink-emphasis) }
+.editor::highlight(md-ink-strike) { color: var(--ink-strike) }
+.editor::highlight(md-ink-code) { color: var(--ink-code); background-color: var(--ink-code-bg) }
+.editor::highlight(md-ink-link) { color: var(--ink-link) }
+.editor::highlight(md-ink-quote),
+.editor::highlight(md-ink-list),
+.editor::highlight(md-ink-marker) { color: var(--ink-muted) }
 .slide-column { flex: 1; min-width: 0; height: 100%; position: relative }
 .slide-host { display: block; height: 100%; width: 100% }
 .toolbar-reveal {

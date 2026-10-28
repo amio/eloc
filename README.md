@@ -8,6 +8,7 @@ Eloquence cli. For presenters who (1) focus on writing, (2) present in a concise
 
 - Serve markdown as presentation
 - Live editor
+- Native Markdown source highlighting with md-ink
 - Export to html
 - Print view / Mobile view / Dark mode
 - Keyboard, touch, and on-screen presentation controls
@@ -168,6 +169,12 @@ During local authoring, Esc opens the editor and Cmd/Ctrl+S saves through the
 CLI's token-protected save endpoint. The local server listens only on
 `127.0.0.1`; unselected hidden files and directories are not served.
 
+The native textarea uses [md-ink](https://github.com/amio/md-ink) for Markdown
+source highlighting, with light and dark syntax colors. Highlighting requires
+the CSS Custom Highlight API and textarea `createValueRange()` support; other
+browsers retain plain-text editing. The highlighter is bundled into the CLI and
+static HTML, so it needs no CDN or network access while editing.
+
 On exported sites, the editor previews changes in the current tab and
 **Download** (or Cmd/Ctrl+S) downloads the Markdown. Loading another document with
 `?src=...` also uses downloads, with that document's filename, instead of writing
@@ -190,6 +197,8 @@ npm test                 # TypeScript, source build, core tests, browser/CLI tes
 npm run test:unit         # Core tests; no bundle or browser required
 npm run test:coverage     # Core source coverage using Node V8
 npm run test:e2e          # Requires an existing build and public/ export
+# Test native textarea highlighting with a locally installed supported Chrome.
+ELOC_E2E_CHANNEL=chrome npm run test:e2e -- tests/e2e/highlighting.spec.ts
 ```
 
 The CLI entry point only parses arguments, dispatches commands, and reports errors.

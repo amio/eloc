@@ -1,5 +1,6 @@
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from 'solid-js'
 import type { DeckDocument } from './document'
+import { Editor } from './editor'
 import { pageAtOffset, parsePages } from './pages'
 import { Slide } from './slide'
 
@@ -184,10 +185,7 @@ export function Deck(props: DeckProps) {
       <div class="workspace">
         <Show when={view() === 'edit' && !nativePrint()}>
           <aside class="editor-column" aria-label="Markdown editor">
-            <textarea class="editor" aria-label="Markdown" spellcheck={false}
-              value={markdown()} ref={focusEditor} onInput={event => updateFromEditor(event.currentTarget)}
-              onClick={event => updateFromEditor(event.currentTarget)}
-              onKeyUp={event => { if (event.code !== 'Escape') updateFromEditor(event.currentTarget) }} />
+            <Editor value={markdown()} onReady={focusEditor} onChange={updateFromEditor} />
           </aside>
         </Show>
         <div class="slide-column" onTouchStart={touchStart} onTouchEnd={touchEnd} onTouchCancel={() => { touch = undefined }}>

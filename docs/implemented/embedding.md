@@ -81,6 +81,12 @@ the standalone or embed environment; `src/client/persistence.ts` owns local-save
 authorization and download execution. The document model performs neither writes
 nor downloads and does not read host URL query parameters.
 
+`src/client/editor.tsx` owns the native textarea and its md-ink instance. Native
+input refreshes highlighting through md-ink; programmatic value changes explicitly
+refresh it after assignment. Unmounting the editor releases its ranges and input
+listener, including edit/print view transitions. Highlight CSS follows the deck's
+light/dark theme; unsupported browsers keep the same plain-text editor.
+
 For a future published browser module, the planned initialization API remains:
 
 ```ts
