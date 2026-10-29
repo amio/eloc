@@ -20,7 +20,7 @@
     "dev": "node scripts/build.mjs --watch",
     "typecheck": "tsc --noEmit",
     "build": "node scripts/build.mjs",
-    "build:site": "npm run build && node dist/index.js build deck.md --title \"eloc \u2014 Markdown presentations\" --progress-bar",
+    "build:site": "npm run build && node dist/index.js build deck.md --title \"eloc — Markdown presentations\" --progress-bar && node scripts/build-site.mjs",
     "test": "npm run typecheck && npm run build:site && npm run test:unit && npm run test:e2e",
     "test:unit": "node --test tests/unit/*.test.ts",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-include=src/** tests/unit/*.test.ts",

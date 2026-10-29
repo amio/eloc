@@ -3,9 +3,11 @@ import type { DeckConfig } from './config'
 import { Deck, type SaveRequest } from './deck'
 import { createDocument, resolveSource } from './document'
 import { createStandalonePersistence } from './persistence'
+import { Site } from './site'
 
 export function App(props: { config: DeckConfig }) {
   const config = props.config
+  if (config.mode === 'site') return <Site />
   const params = new URL(location.href).searchParams
   if (config.mode === 'embed') {
     const deckDocument = createDocument(params.get('src') || '')

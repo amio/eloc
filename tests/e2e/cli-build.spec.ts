@@ -80,11 +80,13 @@ test.describe('Eloc CLI export', () => {
 })
 
 test('the root deck exports into a fully interactive offline-capable site', async ({ page, context }) => {
+  const rootOutput = 'test-results/root-deck-output'
+  await exec(process.execPath, ['dist/index.js', 'build', 'deck.md', '--out-dir', rootOutput, '--title', 'eloc — Markdown presentations', '--progress-bar'])
   await context.route(/https:\/\//, route => route.abort())
-  await page.goto(`${staticURL}/public/index.html`)
+  await page.goto(`${staticURL}/${rootOutput}/index.html`)
   await expect(page).toHaveTitle('eloc — Markdown presentations')
   await expect(page.locator('.slide-host h2')).toHaveText('eloc')
-  expect(await readFile('public/deck.md', 'utf8')).toBe(await readFile('deck.md', 'utf8'))
+  expect(await readFile(join(rootOutput, 'deck.md'), 'utf8')).toBe(await readFile('deck.md', 'utf8'))
   const count = await page.getByRole('status', { name: 'Slide count' }).textContent()
   expect(Number(count?.split('/')[1])).toBeGreaterThan(5)
   // After the initial HTML and Markdown load, the renderer requires no network.

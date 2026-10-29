@@ -2,5 +2,19 @@
   "version": 2,
   "installCommand": "npm ci",
   "buildCommand": "npm run build:site",
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/new",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/local/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/local/:id/",
+      "destination": "/index.html"
+    }
+  ]
 }

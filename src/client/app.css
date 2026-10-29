@@ -82,3 +82,32 @@ button { cursor: pointer }
   .editor-column, .toolbar-reveal, .progress-bar, .toast { display: none !important }
   .slide-host, .print-wrap .slide-host { height: 100vh; break-after: page; break-inside: avoid }
 }
+
+/* The website is a host for the same player used by standalone exports. */
+.home { min-height: 100%; background: #f5f3ed; color: #20231f; padding: 0 clamp(24px, 6vw, 96px) 80px }
+.home-header { height: 88px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #d9d9d0 }
+.home-brand { color: inherit; font-size: 27px; font-weight: 800; letter-spacing: -.08em; text-decoration: none }
+.home-new { color: inherit; font-size: 14px; font-weight: 650; text-decoration: none }
+.home-new span, .home-cta span { margin-left: 18px }
+.home-intro { padding: clamp(72px, 10vw, 145px) 0 70px; max-width: 850px }
+.home-eyebrow, .demo-label { font-size: 11px; letter-spacing: .14em; font-weight: 700 }
+.home-eyebrow { color: #6c7861; margin: 0 0 28px }
+.home-intro h1 { font-family: Georgia, serif; font-size: clamp(58px, 8.5vw, 120px); line-height: .97; letter-spacing: -.055em; font-weight: 400; margin: 0 }
+.home-intro h1 em { color: #718367; font-weight: 400 }
+.home-intro > p:not(.home-eyebrow):not(.home-note) { font-size: clamp(17px, 2vw, 21px); color: #666d62; margin: 27px 0 32px }
+.home-cta { display: inline-block; padding: 16px 20px; border-radius: 4px; background: #25372a; color: white; font-size: 14px; font-weight: 650; text-decoration: none }
+.home-cta:hover { background: #3d5541 }
+.home-note, .demo-hint { font-size: 12px; color: #747a70 }
+.home-note { margin-top: 14px }
+.home-demo { max-width: 1200px; margin: 0 auto }
+.demo-label { display: flex; justify-content: space-between; color: #6c7861; margin-bottom: 14px }
+.demo-frame { position: relative; height: min(62vw, 660px); min-height: 320px; border: 1px solid #d6d8cf; box-shadow: 0 20px 60px #29362614; overflow: hidden; background: white }
+.demo-frame .toolbar-reveal { position: absolute }
+.demo-frame .toolbar { transform: none; opacity: 1; pointer-events: auto }
+.demo-frame .workspace { height: calc(100% - 44px) }
+.demo-hint { text-align: right }
+.missing { min-height: 100%; background: #f5f3ed; padding: clamp(32px, 8vw, 100px); color: #20231f }
+.missing h1 { font: 400 clamp(48px, 6vw, 80px)/1 Georgia, serif; letter-spacing: -.04em; margin: 100px 0 24px }
+.missing p { color: #666d62; max-width: 480px; line-height: 1.6 }
+.missing p a { color: inherit }
+@media (max-width: 600px) { .home-header { height: 72px } .home-intro { padding: 70px 0 60px } .demo-label span:last-child { display: none } }
