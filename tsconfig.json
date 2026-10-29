@@ -1,31 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
-    "lib": ["esnext", "dom"],
-
-    "outDir": "dist",
-    "composite": true,
-
+    "target": "ES2022",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "strict": true,
-    "sourceMap": false,
-    "allowJs": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
-    "noImplicitAny": false,
-
-    "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true
   },
-
-  "include": ["src"],
-  "exclude": ["dist"],
-  "references": [
-    { "path": "./packages/markdown-deck" },
-    { "path": "./packages/md-editor" }
-  ]
+  "include": ["src", "tests", "playwright.config.ts"]
 }

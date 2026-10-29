@@ -1,7 +1,1 @@
-tsconfig.json
-now.json
-deck.md
-public
-src
-scripts
-packages
+# The package.json files allowlist defines the published CLI contents.

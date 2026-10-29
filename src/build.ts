@@ -1,46 +1,52 @@
-import { cp, mkdir, writeFile } from 'node:fs/promises'
-import { join, dirname } from 'node:path'
+import { cp, mkdir, stat, writeFile } from 'node:fs/promises'
+import { join, dirname, resolve } from 'node:path'
 import { globby } from 'globby'
 
-import { createIndexHTML } from './assets'
-import { resolveDeckAssets } from './deck-assets'
+import { createEmbedHTML, createIndexHTML, type PresentationAssets } from './assets.ts'
+import { resolveDeckAssets, type DeckAssetOptions } from './deck-assets.ts'
 
-interface BuildOptions {
+export interface BuildOptions extends DeckAssetOptions {
   'out-dir'?: string;
-  'include'?: string | string[];
   'title'?: string;
-  'css'?: string | string[];
   'dark'?: boolean;
   'progress-bar'?: boolean;
 }
 
-export default async function build (markdownFile: string, options: BuildOptions) {
+export default async function build (markdownFile: string, options: BuildOptions, assets: PresentationAssets, cwd = process.cwd()) {
   const { 'out-dir': out = 'public', title, dark, 'progress-bar': progressBar } = options
-  const dest = join(process.cwd(), out)
-  const deckAssets = resolveDeckAssets(markdownFile, options)
+  const dest = resolve(cwd, out)
+  const deckAssets = resolveDeckAssets(markdownFile, options, cwd)
+  if (!(await stat(deckAssets.markdownPath)).isFile()) {
+    throw new Error(`Expected a Markdown file: ${markdownFile}`)
+  }
 
-  await globCopy(deckAssets.assetGlobs, deckAssets.rootDir, dest)
+  const matchedFiles = await globby(deckAssets.assetGlobs, { cwd: deckAssets.rootDir })
+  const files = [...new Set([...deckAssets.requiredFiles, ...matchedFiles])]
+  if (files.some(file => file.toLowerCase() === 'embed.html')) throw new Error('Cannot export "embed.html": this filename is reserved for the embedded player')
+  await copyFiles(files, deckAssets.rootDir, dest)
 
-  // write index.html
   const indexHTML = createIndexHTML({
     filename: deckAssets.filename,
+    source: deckAssets.source,
     title,
     css: deckAssets.css,
     dark,
     progressBar
-  })
+  }, assets)
   await outputFile(join(dest, 'index.html'), indexHTML)
+  await outputFile(join(dest, 'embed.html'), createEmbedHTML(assets))
 }
 
-async function globCopy (globs: string[], source: string, dest: string) {
-  const files = await globby(globs, { cwd: source })
-
-  return Promise.all(files.map(async file => {
+async function copyFiles (files: string[], source: string, dest: string) {
+  const results = await Promise.allSettled(files.map(async file => {
     const target = join(dest, file)
 
     await mkdir(dirname(target), { recursive: true })
     await cp(join(source, file), target, { recursive: true })
   }))
+  // A failed export must settle every copy before callers clean up or retry.
+  const failure = results.find(result => result.status === 'rejected')
+  if (failure) throw failure.reason
 }
 
 async function outputFile (file: string, content: string) {

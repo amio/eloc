@@ -1,0 +1,8 @@
+.env*
+.git
+node_modules
+dist
+public
+test-results
+playwright-report
+*.tgz
